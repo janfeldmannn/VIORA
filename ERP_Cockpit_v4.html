@@ -95,6 +95,10 @@ nav{display:flex;gap:2px}
 .sub-head{padding:16px 18px;border-bottom:1px solid var(--bdr)}
 .sub-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px}
 .sub-who{font-size:11px;color:var(--tx3)}
+.sub-pricing{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;margin-top:12px}
+.sub-pricebox{background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:8px 9px;min-width:0}
+.sub-pricebox strong{display:block;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;margin-bottom:3px;white-space:nowrap}
+.sub-pricebox span{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--tx3);white-space:nowrap}
 .sub-body{padding:16px 18px}
 .sub-reason{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:12px;font-style:italic;border-left:2px solid;padding-left:10px}
 .sub-modules{display:flex;flex-wrap:wrap;gap:4px}
@@ -183,6 +187,7 @@ nav{display:flex;gap:2px}
   .view-sub{font-size:11px;margin-bottom:16px}
   .mgrid{grid-template-columns:1fr}
   .sub-grid{grid-template-columns:1fr}
+  .sub-pricing{grid-template-columns:1fr}
   .roles-grid{grid-template-columns:1fr}
   .lang-grid{grid-template-columns:1fr 1fr}
   .addon-grid{grid-template-columns:1fr}
@@ -586,7 +591,7 @@ const SUBS = [
   {
     name:'Core', color:'#6b7394', who:'Freelancer · Kleine Betriebe · Handwerker',
     reason:'Ein vollständig lauffähiges Mini-ERP: Stammdaten, Einkauf, Lager, Verkauf, Dokumente und Reporting. Alles was Geld reinbringt und sauber verwaltet werden muss, ist direkt enthalten.',
-    price:'49 EUR / Monat',
+    price:'49 &euro;', users:2, extraUser:'+5 &euro;',
     modules:['CORE','DS','STAM','I18N','VERK','EINK','LAGER','DMS','REP'],
     modnotes:{
       'CORE':'Grundsystem, Mandanten, Rollen und Rechte',
@@ -603,7 +608,7 @@ const SUBS = [
   {
     name:'Market', color:'#8b5cf6', who:'Online · Multichannel · Kunden & Marketing',
     reason:'Für Betriebe, die aktiv Kunden gewinnen, online verkaufen und Support abwickeln. Ab hier wird aus dem Mini-ERP ein Verkaufssystem.',
-    price:'149 EUR / Monat',
+    price:'149 &euro;', users:5, extraUser:'+7 &euro;',
     modules:['SHOP','INTG','CRM','MKT','HELP'],
     modnotes:{
       'SHOP':'Online-Shop und Checkout',
@@ -616,7 +621,7 @@ const SUBS = [
   {
     name:'Company', color:'#f97316', who:'Unternehmen mit Mitarbeitern und Struktur',
     reason:'Für Organisationen, die intern sauber geführt werden müssen: Buchhaltung, Mitarbeiter, Projekte, Assets, Workflows und interne Kommunikation.',
-    price:'299 EUR / Monat',
+    price:'299 &euro;', users:10, extraUser:'+9 &euro;',
     modules:['FIBU','ZAHL','STEU','HR','PROJ','ASSET','NOTIF','COMM'],
     modnotes:{
       'FIBU':'Finanzbuchhaltung und Buchungslogik',
@@ -632,7 +637,7 @@ const SUBS = [
   {
     name:'Operations', color:'#10b981', who:'Operative Komplexität · Qualität · Lieferkette · Planung',
     reason:'Die Zwischenstufe für Firmen, die echte operative Steuerung brauchen, ohne direkt Enterprise zu sein: Qualität, Supply Chain und Disposition.',
-    price:'499 EUR / Monat',
+    price:'499 &euro;', users:15, extraUser:'+11 &euro;',
     modules:['QM','SCM','DISPO'],
     modnotes:{
       'QM':'Qualitätsmanagement und Prüfprozesse',
@@ -643,7 +648,7 @@ const SUBS = [
   {
     name:'Enterprise', color:'#ef4444', who:'Große Unternehmen · Controlling · Compliance',
     reason:'Management-Level für komplexe Strukturen: Controlling, Kennzahlen, Anlagenbuchhaltung und regulatorische Anforderungen.',
-    price:'799-1.200 EUR / Monat',
+    price:'899 &euro;', users:20, extraUser:'+15 &euro;',
     modules:['BI','KORE','ANLA','COMP'],
     modnotes:{
       'BI':'Business Intelligence und Dashboard-Builder',
@@ -1105,7 +1110,11 @@ function renderSubscriptions() {
           <span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;background:${s.color}15;color:${s.color};border:1px solid ${s.color}30">Stufe ${idx+1}/5</span>
         </div>
         <div class="sub-who">${s.who}</div>
-        <div style="font-family:'DM Mono',monospace;font-size:11px;color:${s.color};margin-top:6px">${s.price}</div>
+        <div class="sub-pricing">
+          <div class="sub-pricebox"><strong style="color:${s.color}">${s.price}</strong><span>Basispreis / Monat</span></div>
+          <div class="sub-pricebox"><strong>${s.users}</strong><span>inkl. Nutzer</span></div>
+          <div class="sub-pricebox"><strong>${s.extraUser}</strong><span>extra Nutzer</span></div>
+        </div>
       </div>
       <div class="sub-body">
         ${cumulativeNote}
