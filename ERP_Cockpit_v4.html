@@ -542,6 +542,1371 @@ let MODS = [
   {id:'EINK', name:'Einkauf',                   group:'Warenwirtschaft',            plan:'Basis',       deps:['STAM','LAGER'],     desc:'Lieferantenbestellungen, Wareneingänge, Einkaufspreise', features:['Lieferantenbestellungen','Einkaufspreise & Staffelpreise','Wareneingänge','Teillieferungen','Rücklieferungen','Lieferantenartikelnummern','Bestellvorschläge','Rechnungsprüfung vorbereiten']},
   {id:'VERK', name:'Verkauf / Aufträge',         group:'Warenwirtschaft',            plan:'Basis',       deps:['STAM'],             desc:'Angebote, manuelle Aufträge, Rechnungen — auch für Freelancer ohne Lager', features:['Angebote','Aufträge & AB','Lieferscheine (optional)','Rechnungen','Gutschriften','Belegnummern (GoBD)','Steuerberechnung','Rabatte & Preisregeln','Kundenpreise','Lagerreservierung (wenn LAGER aktiv)']},
   {id:'POS',  name:'Kassensystem (POS)',         group:'Warenwirtschaft',            plan:'Handel',      deps:['VERK','LAGER'],     desc:'Touch-Kasse, Zahlungsarten, Tagesabschluss — nur für stationäre Läden', features:['Touch-Kassenoberfläche','Artikelsuche','Warenkorb','Bar-, Karten-, Gutscheinzahlung','Storno & Retoure','Belegdruck','Tagesabschluss','Kassenbuch-Anbindung','Offline-Strategie','TSE/GoBD vorbereiten']},
+  {id:'DISPO',name:'Absatzplanung & Dispo',      group:'Warenwirtschaft',            plan:'Add-on',      deps:['LAGER','VERK'],     desc:'Forecasting & Bestellvorschläge — erst sinnvoll ab Verkaufshistorie', features:['Historische Verkaufsauswertung','Forecast-Algorithmus (gleitender Ø)','Automatische Bestellvorschläge','Varianten-Disposition (Größen/Farben)','Reichweiten-Analyse','Saisonplanung','Mindestbestand automatisch anpassen']},
+  {id:'PROD', name:'Produktion',                 group:'Produktion & Commerce',      plan:'Business',    deps:['STAM','LAGER','EINK'],desc:'Stücklisten, Fertigungsaufträge, Kalkulation', features:['Stücklisten (BOM)','Arbeitspläne & Fertigungsschritte','Produktionsaufträge','Materialbedarf berechnen','Materialreservierung','Verbrauchsbuchung','Fertigwarenzugang','Ausschuss & Fehlerware','Produktionskalkulation (Soll/Ist)','Variantenproduktion','Chargenverfolgung / Lot-Tracking']},
+  {id:'SHOP', name:'Online-Shop',                group:'Produktion & Commerce',      plan:'Commerce',    deps:['STAM','LAGER','VERK'],desc:'Shop-Frontend, Warenkorb, Bestellungen, SEO', features:['Shop-Frontend (Next.js SSR)','Produktliste & Suche & Filter','Warenkorb & Checkout','Lager-Reservierungs-Lock','Bestellverwaltung Admin','E-Mail-Bestätigungen','Retourenmanagement','Kundenkonto (optional)','SEO (Schema.org, Sitemap)','Stripe-Checkout']},
+  {id:'INTG', name:'API & Integrationen',        group:'Produktion & Commerce',      plan:'Commerce',    deps:['STAM'],             desc:'REST-API, Webhooks, Marktplätze, Datanorm', features:['REST API mit API-Key-Auth','OpenAPI-Dokumentation','Rate-Limiting','Webhooks (ausgehend)','Datanorm-4-Import','Belegübernahme CSV/JSON','Marktplatz vorbereiten (Amazon, eBay)']},
+  {id:'PROJ', name:'Projekte & Verträge',        group:'Produktion & Commerce',      plan:'Business',    deps:['VERK'],             desc:'Projektabrechnung, Zeiterfassung, Rahmenverträge', features:['Projekte mit Budget & Deadline','Projektpositionen','Zeiterfassung (shared mit HR)','Soll-Ist-Stunden','Festpreis / Aufwand / Meilenstein','Rahmenverträge','Leistungsnachweise','Projektabrechnung → Rechnung']},
+  {id:'DMS',  name:'Dokumente & E-Rechnung',     group:'Rechnungswesen & Finanzen',  plan:'Basis',       deps:['CORE'],             desc:'GoBD-Archivierung, XRechnung, ZUGFeRD — auch für Freelancer Pflicht', features:['PDF-Belege (react-pdf)','GoBD-Unveränderlichkeit','10-Jahre-Archiv','Dokumentenupload & Belegverknüpfung','XRechnung XML','ZUGFeRD PDF/A-3','Dokumentensuche','S3/R2 Cloud-Speicher']},
+  {id:'FIBU', name:'Finanzbuchhaltung',          group:'Rechnungswesen & Finanzen',  plan:'Business',    deps:['VERK','POS'],       desc:'Doppelte Buchführung, Kassenbuch, Kontenrahmen', features:['Buchungsmaschine (Soll/Haben)','SKR03/SKR04','Kassenbuch','Ausgangs- & Eingangsrechnungen','Offene Posten','Zahlungseingänge & -ausgänge','CSV-Export','Steuerberater-Zugang (Read-Only)']},
+  {id:'ZAHL', name:'Zahlungsverkehr',            group:'Rechnungswesen & Finanzen',  plan:'Business',    deps:['FIBU'],             desc:'SEPA, Mahnwesen, Zahlungsabgleich', features:['SEPA-Lastschriften (pain.008)','SEPA-Überweisungen (pain.001)','Mandatsverwaltung','Mahnwesen 3 Stufen','Mahngebühren & Mahn-E-Mail','Zahlungsabgleich']},
+  {id:'STEU', name:'Steuer & Abschluss',         group:'Rechnungswesen & Finanzen',  plan:'Business',    deps:['FIBU'],             desc:'USt-VA, DATEV-Export, BWA, Jahresabschluss', features:['USt-Voranmeldung','ELSTER-XML vorbereiten','DATEV-Export (EXTF)','BWA','GuV-Gliederung','Jahresabschluss-Vorbereitung','Offene-Posten-Zusammenfassung']},
+  {id:'KORE', name:'Kostenrechnung',             group:'Rechnungswesen & Finanzen',  plan:'Enterprise',  deps:['FIBU','PROD'],      desc:'Kostenstellen, Planung, Konsolidierung', features:['Kostenstellen (KST)','KST-Buchungen','Kostenträger','Plankosten vs. Istkosten','Konsolidierung','Gemeinkostenzuschläge','KST-Auswertungen']},
+  {id:'ANLA', name:'Anlagenbuchhaltung',         group:'Rechnungswesen & Finanzen',  plan:'Enterprise',  deps:['FIBU'],             desc:'AfA-Berechnung, Anlagenspiegel (buchhalt. Ebene)', features:['Anlage-Stamm (Buchhaltung)','Nutzungsdauer & AfA-Methode','AfA-Buchungen automatisch','Anlagenabgang buchen','Anlagenspiegel','Kostenstellen-Verknüpfung']},
+  {id:'CRM',  name:'CRM & Verkaufschancen',      group:'CRM, Marketing & Vertrieb',  plan:'Commerce',    deps:['STAM','VERK'],      desc:'Pipeline, Leads, Deals, Kommunikationshistorie', features:['Kontaktverwaltung','Kundenhistorie (Belege + Aktivitäten)','Deals & Pipeline','Lead-Verwaltung & Lead-Scoring','Aktivitäten (Anruf, Meeting, E-Mail)','Kundensegmentierung','Wiedervorlagen','Kampagnenzuordnung']},
+  {id:'MKT',  name:'Marketing & Kampagnen',      group:'CRM, Marketing & Vertrieb',  plan:'Commerce',    deps:['CRM','STAM'],       desc:'Kampagnen, Newsletter, Gutscheincodes, ROI', features:['Kampagnenverwaltung','Zielgruppen aus Kundenstamm','E-Mail-Kampagnen mit Templates','Gutscheincodes','Aktionszeiträume','Loyalitätsprogramm vorbereiten','UTM-Tracking','Kampagnen-ROI','A/B-Test vorbereiten','Newsletter DSGVO-konform']},
+  {id:'SCM',  name:'Supply Chain Management',    group:'CRM, Marketing & Vertrieb',  plan:'Enterprise',  deps:['EINK','LAGER','PROD','DISPO'],desc:'Gesamte Lieferkette: Lieferantenbewertung, Risiken, Rahmenverträge', features:['Lieferanten-Bewertung (Scorecards)','Lieferanten-Audits & Zertifikate','Multi-Lieferanten-Strategie','Lead-Time-Tracking','Rahmenverträge (Jahresmengen)','Supply-Chain-Risikoregister','Engpasserkennung','Importabwicklung (Zoll, HS-Code)','Incoterms']},
+  {id:'HR',   name:'Personalwesen (HR)',          group:'Personal & Organisation',    plan:'Business',    deps:['CORE'],             desc:'Mitarbeiterverwaltung, Urlaub, Schicht, Lohnvorbereitung', features:['Mitarbeiterstammdaten','Vertragsarten (Vollzeit, Minijob...)','Arbeitszeitmodelle','Urlaubsverwaltung','Krankmeldungen','Zeiterfassung (Stempeluhr) — shared','Überstunden-Konto','Schichtplanung / Dienstplan','Lohnabrechnung vorbereiten','DATEV-Lohn-Export','Organigramm','Personalkosten-Auswertung']},
+  {id:'QM',   name:'Qualitätsmanagement',        group:'Qualität, Support & Assets', plan:'Business',    deps:['PROD','EINK'],      desc:'Produktqualität: Prüfpläne, Reklamationen, Sperrlager', features:['Prüfpläne definieren','Wareneingangs-Qualitätsprüfung','Produktionsprüfung (Inline + Final)','Prüfergebnisse (io/nio/Nacharbeit/Ausschuss)','Sperrlager','Interne Reklamationsverwaltung','Lieferantenreklamation','8D-Report vorbereiten','Qualitäts-KPIs','Zertifikat-Verwaltung']},
+  {id:'HELP', name:'Helpdesk & Kundensupport',   group:'Qualität, Support & Assets', plan:'Commerce',    deps:['CRM','STAM'],       desc:'Kundenanfragen, Tickets, SLA, Wissensdatenbank', features:['Ticket-Erstellung (manuell, E-Mail, Formular)','Ticket-Kategorien & Prioritäten','Zuweisung an Teams','Status-Workflow','SLA-Zeiten & Überwachung','Interne Notizen vs. Kundenantworten','CRM & Belegverknüpfung','Wissensdatenbank','E-Mail-Integration','Eskalations-Workflow']},
+  {id:'ASSET',name:'Asset Management & Fuhrpark',group:'Qualität, Support & Assets', plan:'Business',    deps:['CORE','FIBU'],      desc:'Betriebsmittel, Fahrzeuge, Wartung (physische Ebene)', features:['Asset-Stamm (Geräte, Maschinen, IT)','Standort & Verantwortlicher','Wartungsplan & -protokoll','Reparaturhistorie','Fuhrpark (KFZ, TÜV, Versicherung)','Fahrtenbuch vorbereiten','Fahrzeugbuchung','Leasing-Verwaltung','QR-Code Labels']},
+  {id:'REP',  name:'Reporting & Auswertungen',   group:'Analyse & Reporting',        plan:'Basis',       deps:['CORE'],             desc:'Dashboards, Umsatz, Lager, Export — modulübergreifend', features:['Zentrales KPI-Dashboard','Umsatzlisten (nach Zeit, Filiale, Artikel, Kanal)','Lagerwert & ABC-Analyse','Renner/Penner-Analyse','Rohertrag','Tages- & Monatsberichte','CSV/XLSX-Export','E-Mail-Reports (täglich/wöchentlich)']},
+  {id:'BI',   name:'Business Intelligence',      group:'Analyse & Reporting',        plan:'Enterprise',  deps:['REP'],              desc:'Dashboard-Builder, Planwerte, Drill-Down, Forecasting', features:['Dashboard-Builder (Drag & Drop)','Kreuzauswertungen','Zielwert-Tracking (Soll/Ist)','Budgetplanung','Automatische Abweichungsanalyse','Drill-Down bis Einzelbeleg','Externe Daten importieren','Bericht-Abonnements','Power BI / Tableau API','White-Label BI']},
+  {id:'COMP', name:'Compliance & Risiko',        group:'Analyse & Reporting',        plan:'Enterprise',  deps:['CORE','FIBU','HR'],  desc:'Risikoregister, DSGVO, Richtlinien, IKS', features:['Risikoregister','Maßnahmen-Tracking','DSGVO Verarbeitungsverzeichnis (Art.30)','DSGVO Anfragen (Auskunft, Löschung)','Compliance-Checklisten (GoBD, TSE, DSGVO)','Dokumentenlenkung & Versionierung','Richtlinien-Verwaltung','Whistleblowing vorbereiten']},
+  {id:'NOTIF',name:'Benachrichtigungen & Workflows',group:'Analyse & Reporting',     plan:'Business',    deps:['CORE'],             desc:'Automatische Trigger, Alerts, Workflow-Automation', features:['Regelbasierte Trigger (wenn X → dann Y)','Bestand < Minimum → Bestellvorschlag','Zahlungsverzug → Mahnung-Workflow','Push- & E-Mail-Benachrichtigungen','In-App Notification Center','Workflow-Editor (visuell, no-code)','Webhook-Ausgang bei Ereignissen']},
+  {id:'PROD', name:'Produktion',                 group:'Produktion & Commerce',      plan:'Add-on',      deps:['STAM','LAGER','EINK'],desc:'Eigene Herstellung: Stücklisten, Fertigung, Kalkulation — zubuchbar ab Basis', features:['Stücklisten (BOM)','Arbeitspläne & Fertigungsschritte','Produktionsaufträge','Materialbedarf berechnen','Materialreservierung','Verbrauchsbuchung','Fertigwarenzugang','Ausschuss & Fehlerware','Produktionskalkulation (Soll/Ist)','Variantenproduktion','Chargenverfolgung / Lot-Tracking']},
+  {id:'RDEV', name:'Produktentwicklung (R&D)',   group:'Produktion & Commerce',      plan:'Add-on',      deps:['STAM','PROD'],      desc:'Neue Produkte konzipieren, Prototypen, Freigabeprozesse — vor der Produktion', features:['Produktideen & Konzepte verwalten','Technische Zeichnungen & Specs hochladen','Materialliste für Prototypen','Musterverwaltung (Prototyp → Freigabe → Serie)','Versionierung von Produktvarianten','Vor-Kalkulation vor Produktionsstart','Freigabe-Workflow (Design → Produktion)','Verknüpfung zu PROD: freigegebenes Produkt → Stückliste']},
+  {id:'KONNEKT',name:'Shop-Konnektoren',         group:'Produktion & Commerce',      plan:'Add-on',      deps:['INTG','STAM','LAGER'],desc:'Fertige Konnektoren zu bestehenden Shops & Marktplätzen', features:['Shopify-Konnektor (Bestellungen, Bestand, Produkte)','WooCommerce-Konnektor (WordPress-Shops)','Shopware-Konnektor (DE-Markt)','Wix / Squarespace (per Webhook)','Amazon Seller Central (Bestellungen + FBA-Bestand)','Etsy (für Künstler und Handmacher)','Bestand bidirektional synchron halten','Bestellungen automatisch in VERK übernehmen','Konflikt-Handling bei Lagerengpässen']},
+  {id:'REISE', name:'Reisekostenabrechnung',     group:'Personal & Organisation',    plan:'Add-on',      deps:['HR','FIBU'],        desc:'Reisen erfassen in HR, Verbuchung läuft automatisch in FIBU', features:['Reiseantrag & Genehmigung','Kilometerpauschale (aktueller Steuersatz)','Tagesgelder (In- und Ausland)','Belegerfassung per Foto (mobile)','Kategorien: Hotel, Bahn, Flug, Taxi, Verpflegung','Automatische Buchung in FIBU nach Freigabe','DATEV-Export der Reisekosten','Kreditkarten-Abgleich vorbereiten','Monatsreport Reisekosten pro Mitarbeiter']},
+  {id:'GAST', name:'Gastro / Café / Bar',        group:'Warenwirtschaft',            plan:'Add-on',      deps:['POS','STAM'],       desc:'Tischbasierte Gastronomie — sehr spezifisch', features:['Tischplan','Bestellung pro Tisch','Speise- & Getränkekarte','Gangfolge','Tischstatus','Split-Rechnung','Küchenbon & Barbon','Tischumbuchung','Tagesabschluss Gastro']},
+  {id:'SOCI', name:'Social Media Management',    group:'CRM, Marketing & Vertrieb',  plan:'Add-on',      deps:['MKT'],              desc:'Redaktionskalender, Posting, Analytics — nicht für jeden', features:['Kanal-Verwaltung (Instagram, TikTok, LinkedIn...)','Redaktionskalender','Beitragsentwürfe mit Medien','Geplante Veröffentlichung','Produkt-Tags in Posts','Content-Bibliothek','Basis-Analytics','Genehmigungsworkflow']},
+  {id:'LABEL',name:'Barcode & Label-Druck',      group:'Warenwirtschaft',            plan:'Add-on',      deps:['STAM','LAGER'],     desc:'Etiketten für Artikel, Assets und Pakete drucken', features:['Barcode-Generierung (EAN, QR, Code128)','Label-Designer (Felder, Logo, Layout)','Druckeranbindung (Zebra, Dymo)','Artikel-Etiketten','Asset-Labels','Versandlabels vorbereiten','Chargenetiketten']},
+  {id:'KALEN',name:'Kalender & Termine',         group:'Personal & Organisation',    plan:'Add-on',      deps:['CORE','HR'],        desc:'Zentraler Unternehmenskalender, Terminsynchronisation', features:['Zentraler Unternehmenskalender','Persönliche Kalender pro Mitarbeiter','Termine & Aufgaben','Ressourcenbuchung (Räume, Maschinen)','CalDAV-Sync (Google, Outlook)','Erinnerungen','Urlaub- & Abwesenheitsansicht']},
+  {id:'MSG',  name:'Internes Messaging',         group:'Personal & Organisation',    plan:'Add-on',      deps:['CORE'],             desc:'Interne Kommunikation: Direktnachrichten, Channels, Benachrichtigungen', features:['Direktnachrichten zwischen Nutzern','Gruppen-Channels (z.B. #einkauf, #lager)','Dateianhänge in Nachrichten','Gelesen/Ungelesen-Status','In-App Push-Benachrichtigungen','Nachrichtensuche','Pinned Messages','Rein intern — kein Kundenkontakt (dafür: Helpdesk)']},
+  {id:'DISPO',name:'Absatzplanung & Dispo',      group:'Warenwirtschaft',            plan:'Add-on',      deps:['LAGER','VERK'],     desc:'Forecast & Bestellvorschläge — erst wenn Verkaufshistorie vorhanden', features:['Historische Verkaufsauswertung','Forecast-Algorithmus','Automatische Bestellvorschläge','Varianten-Disposition','Reichweiten-Analyse','Saisonplanung']},
+  // Branchenspezifische Vertikal-Add-ons
+  {id:'HWK',  name:'Handwerk-Modus',             group:'Produktion & Commerce',      plan:'Add-on',      deps:['VERK','LAGER'],     desc:'Speziell für Handwerksbetriebe: Aufmaß, Baustellen, Stundenzettel', features:['Aufmaßerfassung (mobile)','Baustellenverwaltung','Stundenzettel pro Baustelle','Materialaufwand pro Auftrag','GAEB-Import (Ausschreibungen)','Wartungsverträge & Serviceaufträge','Regiezettel digital','Abnahmeprotokoll']},
+  {id:'IMMO', name:'Immobilienverwaltung',        group:'Produktion & Commerce',      plan:'Add-on',      deps:['CORE','STAM','FIBU'],desc:'Für Vermieter & Hausverwaltungen: Objekte, Mieter, Nebenkostenabrechnung', features:['Objektstamm (Gebäude, Einheiten)','Mieterstamm & Mietverträge','Mieteingang buchen & überwachen','Nebenkostenabrechnung','Instandhaltungsaufträge','Leerstandsverwaltung','Indexmieten & Mietanpassungen','Eigentümerreporting']},
+  {id:'EVENT',name:'Eventmanagement',             group:'CRM, Marketing & Vertrieb',  plan:'Add-on',      deps:['CORE','STAM'],      desc:'Veranstaltungen planen, Tickets verkaufen, Gästelisten verwalten', features:['Event-Stamm (Datum, Location, Kapazität)','Ticketverwaltung & Preiskategorien','Gästeliste & Check-in (QR-Code)','Online-Ticketshop (verknüpft mit SHOP)','Sponsoren verwalten','Budgetplanung Event','Catering-Koordination','Nachbericht & Auswertung']},
+  {id:'ABO',  name:'Abonnement-Verwaltung',       group:'CRM, Marketing & Vertrieb',  plan:'Add-on',      deps:['VERK','FIBU','ZAHL'],desc:'Für Unternehmen die selbst Abos verkaufen: Boxen, Magazine, Services', features:['Abo-Produkte & Laufzeiten definieren','Automatische Rechnungsstellung (monatlich/jährlich)','Pause & Kündigung durch Kunden','Dunning (Zahlungserinnerung bei fehlgeschlagenem Lastschrift)','Abo-Dashboard (MRR, Churn, Neuanmeldungen)','Pause- & Kündigungsworkflow','Upgrade & Downgrade','Versandliste für Box-Abos generieren']},
+  {id:'MED',  name:'Praxis & Medizin',            group:'Personal & Organisation',    plan:'Add-on',      deps:['CORE','STAM'],      desc:'Für Arztpraxen, Therapeuten, Heilpraktiker: Termine, Patienten, Abrechnung', features:['Patientenstamm (DSGVO-konform)','Online-Terminbuchung','Behandlungsdokumentation','GOÄ / GKV-Abrechnung vorbereiten','Rezeptverwaltung','Karteikarte digital','Warteliste','Recall-System (Erinnerungen für Patienten)']},
+  {id:'FRAN', name:'Franchise-Management',        group:'Plattform',                  plan:'Add-on',      deps:['CORE','PLAT'],      desc:'Für Franchisegeber: Lizenznehmer verwalten, Standards durchsetzen', features:['Lizenznehmer-Verwaltung','Lizenzgebühren automatisch abrechnen','Marken- & Style-Guide-Portal','Standardisierte Prozessvorlagen','Umsatz-Reporting aller Filialen für Franchisegeber','Audit-Checklisten für Filialen','Onboarding neuer Lizenznehmer','Kommunikationskanal Franchisegeber → Nehmer']},
+  {id:'PLAT', name:'Plattform-Admin (SaaS)',     group:'Plattform',                  plan:'Plattform',   deps:['CORE'],             desc:'NUR für dich als Inhaber — separates System, erst später relevant', features:['Tenant-Onboarding Flow','Stripe Billing pro Modul','Self-Service Modulbuchung durch Kunden','Super-Admin Dashboard (alle Tenants)','Mandanten sperren/freischalten','White-Label (Logo, Farbe, Custom Domain)','DSGVO-Offboarding (30 Tage Pending-Delete)','Nutzungs-Limits pro Plan','Support-Tier-System','Komplett eigenes Interface — nicht im ERP sichtbar','⚠️ Erst nach vollständigem ERP-Aufbau relevant']},
+];
+
+// ══════════════════════════════════════════════════════
+// SUBSCRIPTION TIERS
+// ══════════════════════════════════════════════════════
+const SUBS = [
+  {
+    name:'Basis', color:'#6b7394', who:'Freelancer · Handwerker · Soloselbstständige · Künstler · Kleine Dienstleister',
+    reason:'Das Fundament für alle, die ein Geschäft betreiben — ohne Ladenlokal oder Kasse. Ein Tischler kauft Rohmaterial ein, lagert es und schreibt Rechnungen. Ein Fotograf verwaltet Ausrüstung und Aufträge. Ein Berater erfasst Leistungen und Angebote. Alle brauchen: Stammdaten, Lager, Einkauf, Verkauf, Belege, Überblick. Was sie nicht brauchen: eine Touch-Kasse. POS kommt erst mit Handel.',
+    modules:['CORE','DS','STAM','I18N','LAGER','EINK','VERK','DMS','REP'],
+    modnotes:{
+      'CORE':'Fundament — immer dabei',
+      'DS':'Design System für konsistente UI',
+      'STAM':'Kunden, Lieferanten, Artikel — zentrale Datenbasis',
+      'I18N':'Von Anfang an mehrsprachig',
+      'LAGER':'Rohmaterial, Fertigteile, Ausrüstung — auch Handwerker lagern',
+      'EINK':'Material einkaufen ist für Tischler, Schneider, Handwerker Alltag',
+      'VERK':'Angebote, Aufträge und Rechnungen — das Kerngeschäft',
+      'DMS':'GoBD-Archivierung ist für jeden Unternehmer gesetzlich Pflicht',
+      'REP':'Umsatzübersicht und offene Posten — Basis-Controlling'
+    }
+  },
+  {
+    name:'Handel', color:'#10b981', who:'Stationärer Einzelhandel · Läden · Filialen mit Verkaufstheke',
+    reason:'Wer einen Laden mit Verkaufstheke betreibt, braucht eine Touch-Kasse für schnelle Transaktionen. Das ist der einzige echte Unterschied zu Basis — POS. Alles andere (Lager, Einkauf, Verkauf) ist bereits in Basis enthalten.',
+    modules:['POS'],
+    modnotes:{
+      'POS':'Stationäre Touch-Kasse — der Hauptunterschied zu Basis. Nur für Läden mit direktem Kundenverkauf.'
+    }
+  },
+  {
+    name:'Commerce', color:'#8b5cf6', who:'Multichannel · Online-Shop · Wachsende Marken',
+    reason:'Wer online und offline verkauft, braucht zusätzlich Webshop, CRM und Marketing. Diese drei gehören inhaltlich zusammen: ohne Kundendaten (CRM) kann Marketing keine Zielgruppen bauen, ohne Marketing bringt der Shop keine Conversions.',
+    modules:['SHOP','INTG','CRM','MKT','HELP'],
+    modnotes:{
+      'SHOP':'Online-Verkaufskanal — Bestellungen landen in VERK',
+      'INTG':'REST-API für Marktplätze und externe Systeme',
+      'CRM':'Kundenpflege und Pipeline-Management',
+      'MKT':'Kampagnen, Newsletter, Gutscheincodes',
+      'HELP':'Wer online verkauft, bekommt zwangsläufig Supportanfragen'
+    }
+  },
+  {
+    name:'Business', color:'#f97316', who:'Mittelstand · Mehrere Mitarbeiter · Buchhaltung intern',
+    reason:'Ab einer gewissen Größe wird intern mehr geführt: Lohnbuchhaltung, DATEV-Export, Dienstpläne, Automatisierungen. Produktion ist bewusst herausgenommen — sie ist kein Indikator für Größe sondern für Geschäftsmodell. Ein Händler ohne Eigenfertigung zahlt nicht für PROD.',
+    modules:['FIBU','ZAHL','STEU','HR','DISPO','PROJ','ASSET','NOTIF'],
+    modnotes:{
+      'FIBU':'Doppelte Buchführung ab gewisser Größe notwendig',
+      'ZAHL':'SEPA und Mahnwesen gehören zur FIBU',
+      'STEU':'DATEV-Export für den Steuerberater',
+      'HR':'Ab mehreren Mitarbeitern unverzichtbar',
+      'DISPO':'Forecasting erst sinnvoll ab genug Verkaufshistorie',
+      'PROJ':'Projektabrechnung für Dienstleister',
+      'ASSET':'Betriebsmittel, Fuhrpark, Wartung',
+      'NOTIF':'Workflow-Automatisierung spart Zeit'
+    }
+  },
+  {
+    name:'Enterprise', color:'#ef4444', who:'Konzern · Viele Standorte · Regulierte Branchen',
+    reason:'Kostenrechnung, BI und Compliance sind erst bei komplexen Strukturen nötig. Wer 3 Filialen hat, braucht keine Konsolidierung. Wer 20 hat oder in regulierten Branchen arbeitet, schon.',
+    modules:['KORE','ANLA','BI','SCM','QM','COMP'],
+    modnotes:{
+      'KORE':'Kostenstellenrechnung erst ab mehreren Bereichen nötig',
+      'ANLA':'Buchhalterische Anlagen-AfA für Konzerne',
+      'BI':'Strategische Analyse und Dashboard-Builder',
+      'SCM':'Lieferketten-Steuerung ab vielen Lieferanten',
+      'QM':'Qualitätssicherung für Produktion und zertifizierte Betriebe',
+      'COMP':'Compliance für regulierte Branchen und Konzerne'
+    }
+  },
+];
+
+const ADDONS = [
+  {id:'PROD',   color:'#f59e0b', why:'Produktion ist keine Frage der Größe, sondern des Geschäftsmodells. Tischler, Schneider, Bäcker brauchen es — ein reiner Händler nie. Deshalb Add-on ab Basis, nicht in einem fixen Plan.'},
+  {id:'RDEV',   color:'#f59e0b', why:'Produktentwicklung braucht nur, wer aktiv neue Produkte designed und freigibt. Ein Tischler der Standardmöbel baut braucht kein R&D-Modul. Für Modemarken, Hersteller mit eigenen Kollektionen und Innovationsprozessen sehr wertvoll.'},
+  {id:'DISPO',  color:'#10b981', why:'Forecasting macht nur Sinn wenn Verkaufshistorie vorhanden ist. Wer gerade startet hat keine 12 Monate Daten. Deshalb Add-on — man schaltet es zu wenn man wirklich von Prognosen profitiert, nicht als Pflicht im Business-Plan.'},
+  {id:'KONNEKT',color:'#8b5cf6', why:'Wer bereits einen bestehenden Shopify-, WooCommerce- oder Shopware-Shop hat, muss den nicht aufgeben. KONNEKT synchronisiert Bestellungen, Bestand und Produkte bidirektional. Für Neukunden die von bestehenden Systemen zu uns wechseln der wichtigste Onboarding-Baustein.'},
+  {id:'REISE',  color:'#06b6d4', why:'Reisekosten haben zwei Seiten: Erfassung (HR) und Verbuchung (FIBU). REISE verbindet beide. Für kleine Betriebe ohne Außendienst unnötig — für Unternehmen mit Mitarbeitern die reisen ein echter Zeitsparer. Belege per Handy fotografieren, automatisch verbuchen.'},
+  {id:'GAST',   color:'#10b981', why:'Gastronomie-Funktionen brauchen nur Cafés, Restaurants und Bars. Für jeden anderen Betrieb irrelevant.'},
+  {id:'SOCI',   color:'#ec4899', why:'Social Media ist für Modemarken, D2C-Brands und Lifestyle-Unternehmen täglich wichtig. Für einen B2B-Hersteller nicht. Zubuchbar für wer es wirklich nutzt.'},
+  {id:'LABEL',  color:'#f59e0b', why:'Label-Druck ist hardwareabhängig (Zebra, Dymo). Nicht jedes Unternehmen hat Spezial-Drucker. Für Lagerbetriebe, Versender und Produzenten sinnvoll.'},
+  {id:'KALEN',  color:'#06b6d4', why:'Separater Kalender ab ~5 Mitarbeitern sinnvoll. Kleinere Teams nutzen Google Calendar. Add-on für wachsende Teams mit Ressourcenbuchungsbedarf.'},
+  {id:'MSG',    color:'#a78bfa', why:'Internes Messaging ab ~5 Mitarbeitern an verschiedenen Standorten wertvoll. Wichtig: MSG ist intern — der Helpdesk ist für Kundenkontakt.'},
+  {id:'HWK',   color:'#f97316', why:'Handwerksbetriebe haben spezifische Anforderungen: Aufmaß, GAEB-Ausschreibungen, Stundenzettel pro Baustelle. Zu spezifisch für den Kernplan — als vertikales Add-on für Dachdecker, Elektriker, Schreiner etc.'},
+  {id:'IMMO',  color:'#3b82f6', why:'Immobilienverwaltung ist ein komplett eigenes Thema. Mietverträge, Nebenkostenabrechnung, Instandhaltung. Für Vermieter und Hausverwaltungen die gleichzeitig ein Handels- oder Dienstleistungsgeschäft haben.'},
+  {id:'EVENT', color:'#ec4899', why:'Eventmanagement für Veranstalter, Agenturen und Unternehmen die regelmäßig Events ausrichten. Ticketverkauf verknüpft mit SHOP, Gästemanagement, Budgetkontrolle.'},
+  {id:'ABO',   color:'#8b5cf6', why:'Für Unternehmen die selbst Abonnements verkaufen (Boxen, Magazine, Software, Dienstleistungen). MRR-Tracking, automatische Abrechnung, Dunning. Komplett anderes Abrechnungsmodell als einmaliger Verkauf.'},
+  {id:'MED',   color:'#ef4444', why:'Praxisverwaltung ist hochspezialisiert: DSGVO für Patientendaten, GOÄ-Abrechnung, Behandlungsdokumentation. Für Ärzte, Therapeuten und Heilpraktiker die zusätzlich ein Produkt- oder Dienstleistungsgeschäft führen.'},
+  {id:'FRAN',  color:'#a78bfa', why:'Franchise-Management erst sinnvoll wenn du aktiv Lizenzen vergibst. Dann aber unverzichtbar: einheitliche Standards, Lizenzgebühren-Abrechnung, Filialen-Reporting.'},
+];
+
+// ══════════════════════════════════════════════════════
+// ROLES
+// ══════════════════════════════════════════════════════
+const ROLES = [
+  {name:'Super-Admin (Plattform)',  color:'#a78bfa', desc:'Du als Inhaber der SaaS-Plattform. Hat Zugriff auf alle Tenants, Billing und Plattform-Admin.',
+   perms:[['PLAT','VOLL'],['Alle Tenant-Daten','LESEN'],['Billing & Subscriptions','VOLL'],['Mandanten sperren','VOLL']]},
+  {name:'Tenant-Admin (Unternehmensleitung)',color:'#3b82f6',desc:'Inhaber/Geschäftsführer des Unternehmens. Vollzugriff auf alle aktivierten Module seines Tenants.',
+   perms:[['Alle aktiven Module','VOLL'],['Benutzerverwaltung','VOLL'],['Modulverwaltung','VOLL'],['Reporting (alle Filialen)','VOLL'],['FIBU & Lohnabrechnung','VOLL']]},
+  {name:'Filialleiter',             color:'#10b981', desc:'Führt eine einzelne Filiale. Sieht seine Filiale vollständig, aber keine filialen-übergreifenden Gewinnberichte.',
+   perms:[['Lager (eigene Filiale)','VOLL'],['POS','VOLL'],['Verkauf (eigene Filiale)','VOLL'],['Reporting (nur eigene Filiale)','LESEN'],['Personalplanung (eigene Filiale)','VOLL'],['FIBU / Rohertrag gesamt','KEIN']]},
+  {name:'Kassierer / Verkäufer',    color:'#f59e0b', desc:'Bedient die Kasse und hilft Kunden. Kein Zugriff auf Statistiken, Einkauf oder Buchhaltung.',
+   perms:[['POS (Kassenoberfläche)','VOLL'],['Artikelsuche & Bestand','LESEN'],['Storno (mit PIN)','EINGESCHRÄNKT'],['Tagesabschluss','KEIN'],['Reporting','KEIN'],['Einkauf','KEIN']]},
+  {name:'Einkäufer',                color:'#ec4899', desc:'Bestellt Ware bei Lieferanten. Sieht Lagerbestände und Einkaufspreise, aber keine Verkaufsstatistiken oder Roherträge.',
+   perms:[['Einkauf','VOLL'],['Lager (lesen)','LESEN'],['Stammdaten Lieferanten','VOLL'],['Bestellvorschläge / Dispo','LESEN'],['Verkaufsstatistiken','KEIN'],['Rohertrag / Margen','KEIN']]},
+  {name:'Lagerarbeiter',            color:'#84cc16', desc:'Führt Warenbewegungen durch, bucht Eingänge und macht Inventur. Kein Zugriff auf Preise oder Finanzen.',
+   perms:[['Lager (Buchungen)','VOLL'],['Wareneingänge buchen','VOLL'],['Inventur','VOLL'],['Einkaufspreise','KEIN'],['Verkauf / POS','KEIN'],['Reporting','KEIN']]},
+  {name:'Buchhalter / Steuer',      color:'#ef4444', desc:'Verbucht Belege, erstellt USt-VA und exportiert zu DATEV. Kein Zugriff auf operative Bereiche.',
+   perms:[['FIBU','VOLL'],['ZAHL & STEU','VOLL'],['DMS (Belegarchiv)','VOLL'],['Reporting (Finanzen)','VOLL'],['POS / Kassenbuch','LESEN'],['HR Lohnabrechnung','LESEN']]},
+  {name:'HR / Personalreferent',    color:'#06b6d4', desc:'Verwaltet Mitarbeiter, Urlaub und Dienstpläne. Kein Einblick in Finanzkennzahlen oder Kundenpreise.',
+   perms:[['HR (vollständig)','VOLL'],['Zeiterfassung','VOLL'],['Schichtplanung','VOLL'],['Personalkosten (nur HR)','LESEN'],['Kundendaten','KEIN'],['Rohertrag / Margen','KEIN']]},
+  {name:'Produktionsleiter',        color:'#f97316', desc:'Plant und steuert die Fertigung. Sieht Materialbestand und Produktionskosten, aber keine Verkaufspreise.',
+   perms:[['Produktion','VOLL'],['Lager (lesen)','LESEN'],['Einkauf (lesen)','LESEN'],['QM','VOLL'],['Produktionskalkulation','VOLL'],['Kundenpreise / Rohertrag','KEIN']]},
+  {name:'Reporting / Controlling',  color:'#a78bfa', desc:'Analysiert Zahlen für die Unternehmensleitung. Darf alles lesen, aber nichts bearbeiten.',
+   perms:[['Reporting / BI','VOLL'],['Alle Auswertungen','LESEN'],['Rohertrag gesamt','LESEN'],['Lager & Produktion','LESEN'],['Buchungsdaten (lesen)','LESEN'],['Belege erstellen/ändern','KEIN']]},
+];
+
+// ══════════════════════════════════════════════════════
+// PHASES
+// ══════════════════════════════════════════════════════
+const PHASES = [
+  {n:1, name:'Projekt-Setup & Web-Grundlagen',    dur:'1–2 Tage',     mods:[],                    color:'#3b82f6',
+   tasks:[
+     '⚠️ ENTSCHEIDUNG: Das System läuft als Web-App — kein Desktop-Client, kein lokales Programm',
+     'Next.js 14 (App Router) mit TypeScript — SSR für Web-Performance und SEO',
+     'Prisma + SQLite für lokale Entwicklung (später PostgreSQL in Produktion)',
+     'Tailwind CSS konfigurieren',
+     'Ordnerstruktur /modules/ anlegen — jedes Modul ist ein eigener Ordner',
+     'Environment-Dateien (.env.local, .env.example)',
+     'Module- und TenantModule-Tabellen',
+     'CI/CD-Grundstruktur (GitHub Actions)',
+     'Linting & Formatting (ESLint, Prettier)',
+     '📱 MOBILE-FIRST: Tailwind Breakpoints sm/md/lg von Anfang an in allen Komponenten nutzen',
+     '🔐 2FA und SSO als Anforderung notieren — wird in Phase 4 implementiert',
+   ],
+   result:'Lauffähiges Next.js Web-Projekt. Mobile-First-Entscheidung ist getroffen und dokumentiert.'},
+
+  {n:2, name:'Design System & Mobile-UI (DS)',    dur:'3–5 Tage',     mods:['DS'],                color:'#8b5cf6',
+   tasks:[
+     'Design-Token-System (Farben, Typografie, Spacing, Schatten)',
+     'Komponentenbibliothek: Button, Input, Card, Badge, Table, Modal, Toast, BottomSheet',
+     '📱 MOBILE-FIRST: Alle Komponenten zuerst für 375px entwerfen, dann für Desktop erweitern',
+     'Grundlayout Desktop: Sidebar + Header + Content-Area',
+     'Grundlayout Mobile: Bottom Tab Bar + Drawer + Fullscreen-Content',
+     'Dark Mode als Standard, Light Mode vorbereiten',
+     'Touch-Targets: alle klickbaren Elemente min. 44×44px (Apple HIG)',
+     'Swipe-Gesten für Mobile vorbereiten (Navigation, Listenaktionen)',
+     'Accessibility: ARIA, Fokus-Management, Kontrast WCAG 2.1 AA',
+     'Storybook oder Showcase-Seite für alle Komponenten',
+   ],
+   result:'Design System mit echtem Mobile-First — jedes neue Modul sieht auf iPhone und Desktop konsistent aus.'},
+
+  {n:3, name:'i18n — DE + EN + ES sofort',        dur:'1–2 Tage',     mods:['I18N'],              color:'#3b82f6',
+   tasks:[
+     'next-intl installieren und konfigurieren',
+     '/locales/de.json, /locales/en.json, /locales/es.json anlegen',
+     't()-Wrapper in alle UI-Strings von Anfang an einbauen',
+     'Sprachumschaltung im Header und Nutzer-Profil',
+     'Tenant-Standardsprache in DB speichern',
+     'Datums-, Zahlen- und Währungsformate lokalisieren',
+     'Hinweis: Spanisch und Englisch sofort befüllen — Italienisch als leere Datei vorbereiten',
+   ],
+   result:'Drei Sprachen von Anfang an. Neue Sprachen kosten später nur eine JSON-Datei.'},
+
+  {n:4, name:'Auth — Web-Login, Mobile & 2FA',    dur:'2–3 Tage',     mods:['CORE'],              color:'#3b82f6',
+   tasks:[
+     '⚠️ LOGIN ÜBER DAS WEB: Nutzer bekommt eine URL (erp.deinedomain.de) und loggt sich im Browser ein',
+     'NextAuth.js v5 implementieren',
+     'Strategien: E-Mail + Passwort (Credentials), später Google OAuth optional',
+     'bcrypt ≥ 12 für Passwort-Hashing',
+     'Session-Management: JWT mit kurzer Laufzeit + Refresh Tokens',
+     '2FA: TOTP (Google Authenticator / Authy) als Pflicht für Admin-Rollen',
+     'Passwort-Reset per E-Mail (Resend oder Postmark)',
+     '📱 MOBILE: Login-Seite mobile-optimiert — Auto-fill, Face ID / Touch ID vorbereiten (WebAuthn)',
+     'Rate-Limiting auf Login-Endpoint (max. 5 Versuche / 15 Minuten)',
+     'Rollen-Prüfung in Middleware: jede Route prüft Tenant + Modul + Berechtigung',
+   ],
+   result:'Sicherer Web-Login mit 2FA. Funktioniert auf Desktop-Browser und Mobile-Safari identisch.'},
+
+  {n:5, name:'Core & Stammdaten',                 dur:'3–5 Tage',     mods:['CORE','STAM'],       color:'#3b82f6',
+   tasks:[
+     'Datenbankschema: Tenant, Branch, User, Role, Permission',
+     'Module, TenantModule, SubscriptionPlan, PlanModule',
+     'Country, TaxRate, Currency, NumberRange, AuditLog',
+     'Adminbereich: Mandanten, Filialen, Benutzer, Rollen, Module',
+     'Seed-Daten: Tenant, Filiale, Deutschland, MwSt 7%/19%',
+     'Artikelstammdaten, Varianten, Kategorien',
+     'Kunden- und Lieferantenstammdaten',
+     'Preislisten, Größen, Farben, Materialien',
+     'Feature-Gating: ModuleGuard Middleware',
+     '📱 MOBILE: Admin-Bereich als responsive Listenansicht — keine Desktop-only-Tabellen',
+   ],
+   result:'Mandantenfähiges Fundament mit sicherem Login. Stammdaten auf Desktop und Mobile bedienbar.'},
+
+  {n:6, name:'Lager & Einkauf',                   dur:'1–1,5 Wo.',    mods:['LAGER','EINK'],      color:'#10b981',
+   tasks:[
+     'Produkte und Varianten mit SKU-System',
+     'Lagerorte und Bestand pro Filiale',
+     'Warenbewegungslog',
+     'Inventur und Umlagerung',
+     'Lieferantenbestellungen und Wareneingänge',
+     'Teillieferungen und Rücklieferungen',
+     '📱 MOBILE: Lagereingang per Handy buchbar — Barcode-Scan via Kamera (ZXing.js)',
+     '📱 MOBILE: Inventur auf dem Handy — Artikel scannen, Menge eingeben, speichern',
+   ],
+   result:'Lager und Einkauf funktionieren. Inventur kann vom Handy aus gemacht werden.'},
+
+  {n:7, name:'Verkauf & POS',                     dur:'1–1,5 Wo.',    mods:['VERK','POS'],        color:'#10b981',
+   tasks:[
+     'Angebote, Aufträge, Lieferscheine, Rechnungen, Gutschriften',
+     'GoBD-Belegnummern, Steuerberechnung, Lagerabgang',
+     'Touch-Kassenoberfläche — Vollbild, optimiert für iPad/Tablet an der Kasse',
+     'Zahlungsarten: Bar, Karte (Stripe Terminal vorbereiten), Gutschein',
+     'Storno, Retoure, Belegdruck (Browser-Print, Bondrucker)',
+     'Tagesabschluss und Kassenbuch-Übergabe',
+     '📱 MOBILE: Angebote und Rechnungen auf dem Handy erstellen und per Link teilen',
+     'POS Offline-Strategie: Service Worker + IndexedDB für Kassenausfälle',
+   ],
+   result:'Verkaufsprozess und Kassensystem laufen. POS auf Tablet, Belege auf Handy erstellbar.'},
+
+  {n:8, name:'Reporting Basis',                   dur:'3–5 Tage',     mods:['REP'],               color:'#f97316',
+   tasks:[
+     'Zentrales KPI-Dashboard: Tagesumsatz, offene Aufträge, Lagerreichweite',
+     'Umsatzlisten nach Zeitraum, Filiale, Artikel, Kanal',
+     'Tages- und Monatsberichte',
+     'CSV/XLSX-Export',
+     '📱 MOBILE: Dashboard als mobile-optimierte KPI-Karten — kein horizontales Scrollen',
+     'Widgets nach aktiven Modulen dynamisch ein-/ausblenden',
+   ],
+   result:'Wichtige Zahlen auf einen Blick — auch unterwegs am Handy.'},
+
+  {n:9, name:'Produktion (Add-on)',                dur:'1,5–2 Wo.',    mods:['PROD'],              color:'#f59e0b',
+   tasks:[
+     'Stücklisten (BOM) und Arbeitspläne',
+     'Produktionsaufträge erstellen und steuern',
+     'Materialbedarf berechnen, Materialreservierung',
+     'Verbrauchsbuchung und Fertigwarenzugang',
+     'Produktionskalkulation Soll/Ist',
+     'Variantenproduktion (Größen/Farben)',
+     'Chargenverfolgung / Lot-Tracking',
+     '📱 MOBILE: Produktionsstatus auf dem Hallenhandy aktualisieren',
+     'Als eigenständiges Add-on implementiert — aktivierbar ohne Business-Plan',
+   ],
+   result:'Eigene Produkte planbar und herstellbar. Als Add-on für jeden Tischler, Schneider oder Hersteller.'},
+
+  {n:10,name:'Online-Shop & Konnektoren',          dur:'1,5 Wo.',      mods:['SHOP','INTG','KONNEKT'],color:'#8b5cf6',
+   tasks:[
+     'Shop-Frontend (Next.js SSR, SEO, Schema.org)',
+     'Produktsuche, Filter, Warenkorb, Checkout mit Stripe',
+     'Lager-Reservierungs-Lock beim Checkout',
+     'Bestellverwaltung Admin, E-Mail-Bestätigungen, Retourenmanagement',
+     'REST API mit API-Key-Auth und OpenAPI-Dokumentation',
+     'Webhooks (ausgehend)',
+     '🔗 KONNEKTOREN: Shopify-Sync (Bestellungen, Bestand, Produkte bidirektional)',
+     '🔗 KONNEKTOREN: WooCommerce-Sync',
+     '🔗 KONNEKTOREN: Amazon Seller Central (Bestellungen + FBA-Bestand)',
+     '🔗 KONNEKTOREN: Etsy-Sync (für Künstler und Handmacher)',
+     'Konflikt-Handling: was passiert wenn Bestand zwischen zwei Kanälen divergiert?',
+     '📱 MOBILE: Shop-Frontend ist PWA — auf iPhone zum Home-Screen hinzufügbar',
+   ],
+   result:'Eigener Shop läuft. Bestehende Shops (Shopify, WooCommerce, Etsy) synchronisieren automatisch.'},
+
+  {n:11,name:'Rechnungswesen',                     dur:'1,5–2 Wo.',    mods:['DMS','FIBU','ZAHL','STEU'],color:'#ef4444',
+   tasks:[
+     'GoBD-konforme PDF-Belege (react-pdf)',
+     'GoBD-Unveränderlichkeit + Storno-Logik (kein DELETE, nur Storno-Beleg)',
+     'XRechnung XML und ZUGFeRD PDF/A-3',
+     'Buchungsmaschine (doppelte Buchführung, SKR03/SKR04)',
+     'Kassenbuch mit GoBD-Audit-Trail',
+     'SEPA: pain.001 (Überweisungen) und pain.008 (Lastschriften)',
+     'Mahnwesen 3 Stufen mit konfigurierbaren Mahngebühren',
+     'USt-Voranmeldung, DATEV-Export (EXTF), BWA',
+     '📱 MOBILE: Belege fotografieren und hochladen (Eingangsrechnungen)',
+   ],
+   result:'GoBD-konformes, DATEV-fähiges Rechnungswesen. Steuerberater kann sofort arbeiten.'},
+
+  {n:12,name:'CRM & Marketing',                    dur:'1–1,5 Wo.',    mods:['CRM','MKT'],         color:'#ec4899',
+   tasks:[
+     'Kontakte, Leads, Deals, Pipeline-Management',
+     'Aktivitäten: Anruf, Meeting, E-Mail — mit Erinnerungen',
+     'Lead-Scoring, Kundensegmentierung',
+     'Kampagnenverwaltung, E-Mail-Kampagnen, Gutscheincodes',
+     'UTM-Tracking, Kampagnen-ROI, Newsletter DSGVO-konform',
+     '📱 MOBILE: Deals und Aktivitäten im Außendienst erfassen',
+     '📱 MOBILE: Visitenkarten-Scan → neuer Kontakt (ML-basiert vorbereiten)',
+   ],
+   result:'Vollständiger Vertriebszyklus von Lead bis Rechnung. Außendienst arbeitet vom Handy.'},
+
+  {n:13,name:'Personal & HR',                      dur:'1–1,5 Wo.',    mods:['HR','PROJ'],         color:'#06b6d4',
+   tasks:[
+     'Mitarbeiterstammdaten, Verträge, Arbeitszeitmodelle',
+     'Urlaubsverwaltung (Antrag, Genehmigung, Saldo)',
+     'Zeiterfassung per Stempeluhr — unified, auch für Projektzeiten nutzbar',
+     'Überstunden-Konto, Schichtplanung / Dienstplan',
+     'Lohnabrechnung vorbereiten, DATEV-Lohn-Export',
+     '📱 MOBILE: Stempeluhr am Handy — Kommen/Gehen, Pause, Standort optional',
+     '📱 MOBILE: Urlaubsantrag stellen und genehmigen vom Handy',
+     'Projektverwaltung mit Budget, Deadline, Zeitbuchungen',
+     'Projektabrechnung → Rechnung in VERK',
+   ],
+   result:'HR und Projektabrechnung produktiv. Mitarbeiter stempeln per Handy — kein extra Gerät nötig.'},
+
+  {n:14,name:'QM, Helpdesk & Assets',              dur:'1–1,5 Wo.',    mods:['QM','HELP','ASSET'], color:'#84cc16',
+   tasks:[
+     'Prüfpläne, Wareneingangs- und Produktionsprüfung',
+     'Sperrlager, Ausschuss-Buchung, Qualitäts-KPIs',
+     'Ticket-System mit SLA und E-Mail-Integration',
+     'Wissensdatenbank',
+     'Asset-Stamm, Wartungsplanung, Fuhrpark',
+     '📱 MOBILE: QM-Prüfung mit Handy durchführen und direkt eintragen',
+     '📱 MOBILE: Support-Tickets vom Handy beantworten',
+   ],
+   result:'QM, Support und Betriebsmittel zentral. Außendienstmitarbeiter arbeiten mobil.'},
+
+  {n:15,name:'BI, Compliance & Workflows',         dur:'1–1,5 Wo.',    mods:['BI','COMP','NOTIF'], color:'#f97316',
+   tasks:[
+     'Dashboard-Builder (Drag & Drop Widgets)',
+     'Planwerte, Soll-Ist-Abweichung, Drill-Down',
+     'Risikoregister, DSGVO Verarbeitungsverzeichnis',
+     'Compliance-Checklisten (GoBD, TSE, DSGVO)',
+     'Regelbasierter Workflow-Editor (no-code)',
+     'Trigger-System: Bestand < Minimum → Push-Benachrichtigung auf Handy',
+     '📱 MOBILE: BI-Dashboard als mobile KPI-Ansicht — wichtige Zahlen immer dabei',
+   ],
+   result:'Strategische Analyse, Workflows und Compliance. Alerts kommen aufs Handy.'},
+
+  {n:16,name:'Enterprise-Module',                  dur:'1–1,5 Wo.',    mods:['KORE','ANLA','SCM'], color:'#ef4444',
+   tasks:[
+     'Kostenstellen, KST-Buchungen, Plankosten vs. Istkosten, Konsolidierung',
+     'Anlagenbuchhaltung: AfA-Berechnung, Anlagenspiegel, Abgänge',
+     'SCM: Lieferantenbewertung, Lead-Time-Tracking, Rahmenverträge, Engpasserkennung',
+   ],
+   result:'Enterprise-Funktionen für Konzerne und komplexe Lieferketten.'},
+
+  {n:17,name:'Add-ons: Gastro, RDEV, Reise, Labels, Kalender, MSG', dur:'1,5–2 Wo.', mods:['GAST','RDEV','REISE','LABEL','KALEN','MSG'],color:'#10b981',
+   tasks:[
+     'Gastro: Tischplan, Küchenbon, Split-Rechnung, Tagesabschluss → Beleg in VERK',
+     'Produktentwicklung (RDEV): Idee → Prototyp → Muster → Freigabe → Stückliste in PROD',
+     'Reisekosten (REISE): Antrag in HR, Foto-Upload, automatische Buchung in FIBU',
+     '📱 MOBILE REISE: Beleg fotografieren unterwegs → direkt einreichen',
+     'Labels: Barcode-Generierung (EAN/QR), Label-Designer, Zebra/Dymo-Anbindung',
+     'Kalender: Unternehmenskalender, CalDAV-Sync (Google, Outlook), Ressourcenbuchung',
+     'Messaging (MSG): Channels, Direktnachrichten, Dateianhänge — intern, nicht für Kunden',
+     '📱 MOBILE MSG: Push-Benachrichtigungen für neue Nachrichten',
+   ],
+   result:'Alle branchenspezifischen Add-ons fertig und einzeln zubuchbar.'},
+
+  {n:18,name:'Produktions-Deployment & Web-Launch', dur:'1 Wo.',       mods:[],                    color:'#3b82f6',
+   tasks:[
+     'SQLite → PostgreSQL (eine Zeile in schema.prisma)',
+     'NextAuth.js: Login, Sessions, Rollenprüfung in Produktion',
+     'Staging Environment + GitHub Actions CI/CD',
+     'Monitoring: Sentry (Fehler), Pino (strukturierte Logs), UptimeRobot (Uptime)',
+     'Tägliche automatische PG-Backups (Supabase / Railway / Hetzner)',
+     'Cloudflare R2 für Datei-Storage (Belege, PDFs, Bilder)',
+     'Deployment: Vercel (einfachste Option) oder Coolify auf Hetzner (mehr Kontrolle)',
+     'Custom Domain: erp.deinedomain.de → HTTPS automatisch via Cloudflare',
+     'PWA-Manifest: App auf iPhone-Homescreen installierbar',
+     'DSGVO-Checkliste: Cookie-Banner, Datenschutzerklärung, Impressum',
+     'Penetration-Test Basis: OWASP Top 10 Checkliste durchgehen',
+   ],
+   result:'System live als Web-App. Erreichbar von jedem Browser, jedes Handy kann es per Safari nutzen.'},
+
+  {n:19,name:'⚡ SaaS-Plattform (später — eigenes System)', dur:'2–4 Wo.', mods:['PLAT'], color:'#a78bfa',
+   tasks:[
+     '⚠️ DIESE PHASE ERST ANGEHEN WENN DAS ERP STABIL LÄUFT UND DU ERSTE KUNDEN HAST',
+     'Separate Route /platform-admin/ — eigenes Interface, nicht im ERP sichtbar',
+     'Eigener Auth-Layer (Super-Admin, getrennt von Tenant-Admins)',
+     'Tenant-Onboarding: Registrierung → Plan wählen → Module aktivieren → Login erhalten',
+     'Stripe Billing: eigene Price-ID pro Modul und Plan',
+     'Self-Service: Kunde bucht Modul → Stripe-Webhook → TenantModule wird aktiviert',
+     'Super-Admin Dashboard: alle Tenants, MRR, aktive Module, Fehler-Logs',
+     'Mandanten sperren / entsperren (z.B. bei Zahlungsverzug)',
+     'White-Label: Custom Logo, Primärfarbe, Custom Domain via CNAME',
+     'DSGVO-Offboarding: 30 Tage Pending-Delete, Daten-Export nach Art. 20',
+     'Support-Tiers: Basis → Docs, Handel → E-Mail, Business → Chat',
+     '⚡ Dein eigenes Business läuft als Tenant A — du nutzt dein eigenes System',
+   ],
+   result:'SaaS-Plattform als eigenständiges Interface — du kannst das ERP an andere vermieten.'},
+];
+
+// ══════════════════════════════════════════════════════
+// LANGUAGES
+// ══════════════════════════════════════════════════════
+const LANGS = [
+  {flag:'🇩🇪',name:'Deutsch',        status:'done', sl:'PFLICHT — LAUNCH',    note:'Primärsprache. Alle Texte werden auf Deutsch verfasst und dienen als Referenz für Übersetzungen. GoBD, USt-VA und DATEV-Begriffe bleiben auf Deutsch (gesetzlich vorgeschrieben).'},
+  {flag:'🇬🇧',name:'Englisch',       status:'plan', sl:'PHASE 3 — PFLICHT',   note:'Zweite Sprache. Pflicht für internationale SaaS-Kunden und die API-Dokumentation. Ohne English-UI verschließt du dir den gesamten nicht-deutschsprachigen Markt.'},
+  {flag:'🇪🇸',name:'Spanisch',       status:'plan', sl:'PHASE 3 — PFLICHT',   note:'500+ Millionen Sprecher weltweit. Spanien, Lateinamerika und die hispanische Community in den USA machen Spanisch zur zweitwichtigsten Sprache für B2B-SaaS nach Englisch. Für Modebranchen und Retail besonders relevant.'},
+  {flag:'🇮🇹',name:'Italienisch',    status:'plan', sl:'MITTELFRISTIG',        note:'Italien ist einer der stärksten Märkte für Mode, Design und Produktion in Europa. Viele Lieferanten und Partner kommen aus Italien — eine italienische Oberfläche senkt die Einstiegshürde erheblich.'},
+  {flag:'🇹🇷',name:'Türkisch',       status:'later',sl:'MITTELFRISTIG',        note:'Großer Markt in Deutschland und der Türkei. Viele mittelständische Unternehmen in DE haben türkischstämmige Inhaber oder Mitarbeiter. Sinnvoll als vierte oder fünfte Sprache.'},
+  {flag:'🇵🇱',name:'Polnisch',       status:'later',sl:'MITTELFRISTIG',        note:'Zweitgrößte Einwanderergruppe in Deutschland. Viele polnische Unternehmen mit grenzüberschreitendem Handel (Logistik, Produktion, Bau).'},
+  {flag:'🇫🇷',name:'Französisch',    status:'later',sl:'LANGFRISTIG',          note:'Wichtig für SaaS-Expansion nach Frankreich. Der zweitgrößte EU-Markt — bei SaaS-Skalierung jenseits DACH relevant.'},
+  {flag:'🇸🇦',name:'Arabisch (RTL)', status:'later',sl:'LANGFRISTIG',          note:'Erfordert RTL-Layout-Anpassungen (Right-to-Left). Technisch aufwändiger als andere Sprachen. Sinnvoll wenn Expansion in arabischsprachige Märkte konkret geplant ist.'},
+];
+
+// ══════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════
+function showSection(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  document.getElementById('sec-' + id).classList.add('on');
+  if (btn) btn.classList.add('on');
+  document.getElementById('sidebar').style.display = (id === 'modules') ? '' : 'none';
+  if (id === 'mindmap') setTimeout(renderMindmap, 50);
+  // scroll to top on mobile
+  const content = document.querySelector('.content');
+  if (content) content.scrollTop = 0;
+}
+
+// ══════════════════════════════════════════════════════
+// MODULE OVERVIEW
+// ══════════════════════════════════════════════════════
+const GROUP_ORDER = ['Core & System','Warenwirtschaft','Produktion & Commerce','Rechnungswesen & Finanzen','CRM, Marketing & Vertrieb','Personal & Organisation','Qualität, Support & Assets','Analyse & Reporting','Plattform'];
+let activeGroup = null;
+
+function gc(group) { return GC[group] || {hex:'#6b7394',dim:'rgba(107,115,148,.12)'}; }
+
+function renderSidebar() {
+  const el = document.getElementById('sidebar-groups');
+  el.innerHTML = GROUP_ORDER.map(g => {
+    const count = MODS.filter(m => m.group === g).length;
+    const c = gc(g);
+    return `<div class="sidebar-item ${activeGroup===g?'on':''}" onclick="filterGroup('${g}')" style="${activeGroup===g?'border-left:2px solid '+c.hex+';padding-left:6px':''}">
+      <div class="sidebar-dot" style="background:${c.hex}"></div>
+      <span style="flex:1">${g}</span>
+      <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3)">${count}</span>
+    </div>`;
+  }).join('') + `<div class="sidebar-item ${!activeGroup?'on':''}" onclick="filterGroup(null)" style="margin-top:8px;${!activeGroup?'border-left:2px solid #6b7394;padding-left:6px':''}"><div class="sidebar-dot" style="background:#6b7394"></div>Alle Module</div>`;
+}
+
+function filterGroup(g) {
+  activeGroup = g;
+  renderSidebar();
+  renderModules();
+}
+
+function renderModules() {
+  const container = document.getElementById('module-groups');
+  container.innerHTML = '';
+  const groups = activeGroup ? [activeGroup] : GROUP_ORDER;
+  groups.forEach(g => {
+    const mods = MODS.filter(m => m.group === g);
+    if (!mods.length) return;
+    const c = gc(g);
+    const sec = document.createElement('div');
+    sec.className = 'group-section';
+    sec.innerHTML = `<div class="group-hdr"><div class="group-dot" style="background:${c.hex}"></div><span class="group-lbl">${g}</span><span class="group-cnt">${mods.length} Module</span></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'mgrid';
+    mods.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'mc';
+      div.style.cssText = `border-left-color:${c.hex}20`;
+      div.innerHTML = `
+        <style>.mc[data-id="${m.id}"]::before{background:${c.hex}}</style>
+        <div class="ctop">
+          <span class="mid" style="color:${c.hex};border-color:${c.hex}40;background:${c.dim}">${m.id}</span>
+          <span class="plan-b">${m.plan}</span>
+        </div>
+        <div class="mname">${m.name}</div>
+        <div class="mdesc">${m.desc}</div>
+        <div class="mdet">
+          <div class="dlbl">Funktionen</div>
+          <div class="ftags">${m.features.map(f=>`<span class="ftag">${f}</span>`).join('')}</div>
+          ${m.deps.length?`<div class="dlbl">Abhängig von</div><div class="deptags">${m.deps.map(d=>{const dm=MODS.find(x=>x.id===d);const dc=dm?gc(dm.group):{hex:'#6b7394'};return`<span class="deptag" style="color:${dc.hex};border-color:${dc.hex}40;background:${dc.hex}15">${d}</span>`}).join('')}</div>`:''}
+        </div>`;
+      div.setAttribute('data-id', m.id);
+      div.onclick = () => div.classList.toggle('exp');
+      grid.appendChild(div);
+    });
+    sec.appendChild(grid);
+    container.appendChild(sec);
+  });
+}
+
+function addModule() {
+  const id = document.getElementById('ni').value.trim().toUpperCase();
+  const name = document.getElementById('nn').value.trim();
+  if (!id || !name) { alert('ID und Name sind Pflicht.'); return; }
+  MODS.push({
+    id, name,
+    group: document.getElementById('ng').value,
+    plan: document.getElementById('np').value,
+    deps: document.getElementById('nd').value.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean),
+    desc: document.getElementById('nds').value.trim(),
+    features: document.getElementById('nf').value.split(',').map(s=>s.trim()).filter(Boolean),
+  });
+  ['ni','nn','nd','nds','nf'].forEach(id => document.getElementById(id).value = '');
+  renderModules();
+  renderSidebar();
+}
+
+// ══════════════════════════════════════════════════════
+// SUBSCRIPTIONS
+// ══════════════════════════════════════════════════════
+function renderSubscriptions() {
+  const grid = document.getElementById('sub-grid');
+  grid.innerHTML = SUBS.map((s, idx) => {
+    const prevNames = SUBS.slice(0,idx).map(x=>x.name);
+    const cumulativeNote = prevNames.length ? `<div style="font-size:10px;font-family:'DM Mono',monospace;color:${s.color};opacity:.65;margin-bottom:10px;padding:5px 8px;background:${s.color}10;border-radius:4px">↑ enthält alles aus: ${prevNames.join(' + ')}</div>` : '';
+    return `
+    <div class="sub-card" style="border-top:3px solid ${s.color}">
+      <div class="sub-head">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <div class="sub-name" style="color:${s.color}">${s.name}</div>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;background:${s.color}15;color:${s.color};border:1px solid ${s.color}30">Stufe ${idx+1}/5</span>
+        </div>
+        <div class="sub-who">${s.who}</div>
+      </div>
+      <div class="sub-body">
+        ${cumulativeNote}
+        <div class="sub-reason" style="border-color:${s.color}40;color:${s.color}bb">${s.reason}</div>
+        <div class="dlbl" style="margin-bottom:8px">Module in dieser Stufe neu hinzu</div>
+        <div class="sub-modules">
+          ${s.modules.map(mid => {
+            const m = MODS.find(x=>x.id===mid);
+            const c = m ? gc(m.group) : {hex:'#6b7394'};
+            const note = s.modnotes?.[mid];
+            return `<span class="sub-mod" title="${note||''}" style="color:${c.hex};border-color:${c.hex}40;background:${c.hex}15;cursor:${note?'help':'default'}">${mid}</span>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const ag = document.getElementById('addon-grid');
+  ag.innerHTML = ADDONS.map(a => {
+    const m = MODS.find(x=>x.id===a.id);
+    return `<div class="addon-item">
+      <div class="addon-name" style="color:${a.color}">${m?m.name:a.id}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);margin-bottom:6px">${a.id} · zubuchbar ab Basis</div>
+      <div class="addon-why">${a.why}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// ROLES
+// ══════════════════════════════════════════════════════
+function renderRoles() {
+  document.getElementById('roles-grid').innerHTML = ROLES.map(r => `
+    <div class="role-card" style="border-top:2px solid ${r.color}30">
+      <div class="role-name" style="color:${r.color}">${r.name}</div>
+      <div class="role-desc">${r.desc}</div>
+      <div class="role-perms">
+        ${r.perms.map(([mod,lvl]) => {
+          const cls = lvl==='VOLL'?'perm-full':lvl==='LESEN'?'perm-read':lvl==='EINGESCHRÄNKT'?'perm-read':'perm-none';
+          return `<div class="perm-row"><span class="perm-mod">${mod}</span><span class="perm-level ${cls}">${lvl}</span></div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// PHASES
+// ══════════════════════════════════════════════════════
+const done = new Set(JSON.parse(localStorage.getItem('erp-done')||'[]'));
+function saveDone() { try{localStorage.setItem('erp-done',JSON.stringify([...done]))}catch(e){} }
+
+function renderPhases() {
+  const list = document.getElementById('phase-list');
+  list.innerHTML = '';
+  PHASES.forEach(ph => {
+    const isDone = done.has(ph.n);
+    const div = document.createElement('div');
+    div.className = 'pc';
+    const modTags = ph.mods.map(id => {
+      const m = MODS.find(x=>x.id===id);
+      const c = m ? gc(m.group) : {hex:'#6b7394'};
+      return `<span class="pmod" style="color:${c.hex};border-color:${c.hex}40;background:${c.hex}15">${id}</span>`;
+    }).join('');
+    div.innerHTML = `
+      <div class="ph" onclick="togglePhase(this)">
+        <span class="pnum">P${ph.n}</span>
+        <div class="pchk ${isDone?'done':''}" onclick="event.stopPropagation();toggleDone(${ph.n},this)">${isDone?'✓':''}</div>
+        <div class="pinfo">
+          <div class="pname" style="${isDone?'opacity:.45;text-decoration:line-through':''}">${ph.name}</div>
+          <div class="pmeta"><span class="pdur">${ph.dur}</span><div class="pmods">${modTags}</div></div>
+        </div>
+        <span class="pchev">▶</span>
+      </div>
+      <div class="pbody">
+        <ul class="tasklist">${ph.tasks.map(t=>`<li class="ti">${t}</li>`).join('')}</ul>
+        <div class="presult">${ph.result}</div>
+      </div>`;
+    list.appendChild(div);
+  });
+  updateProg();
+}
+
+function togglePhase(hdr) { hdr.parentElement.classList.toggle('open'); }
+
+function toggleDone(n, el) {
+  done.has(n) ? done.delete(n) : done.add(n);
+  el.classList.toggle('done');
+  el.textContent = done.has(n) ? '✓' : '';
+  const nameEl = el.nextElementSibling?.querySelector('.pname');
+  if (nameEl) nameEl.style.cssText = done.has(n) ? 'opacity:.45;text-decoration:line-through' : '';
+  saveDone();
+  updateProg();
+}
+
+function updateProg() {
+  const pct = Math.round(done.size / PHASES.length * 100);
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('pp').textContent = pct + '%';
+}
+
+// ══════════════════════════════════════════════════════
+// MINDMAP — pure SVG with viewBox transform (no split)
+// ══════════════════════════════════════════════════════
+let mmVB = {x:0,y:0,w:1600,h:900}, mmDrag={on:false,lx:0,ly:0};
+
+function mmLayout() {
+  const W=1600, H=900, CX=W/2, CY=H/2;
+  const pos = {};
+  // Center
+  pos['__center'] = {x:CX, y:CY, label:'ERP\nSystem', color:'#ffffff', isCenter:true};
+
+  // Groups radially
+  const groups = GROUP_ORDER.filter(g => MODS.some(m=>m.group===g));
+  const GR = 300;
+  groups.forEach((g, i) => {
+    const a = (2*Math.PI/groups.length)*i - Math.PI/2;
+    const gx = CX + GR*Math.cos(a);
+    const gy = CY + GR*Math.sin(a);
+    pos[g] = {x:gx, y:gy, label:g, color:gc(g).hex, isGroup:true, angle:a};
+
+    // Modules around group
+    const mods = MODS.filter(m=>m.group===g);
+    const MR = 170;
+    const spread = Math.min(Math.PI*0.8, (mods.length-1)*0.35);
+    mods.forEach((m, j) => {
+      const ma = mods.length===1 ? a : a - spread/2 + spread/(mods.length-1)*j;
+      pos[m.id] = {x: gx+MR*Math.cos(ma), y: gy+MR*Math.sin(ma), label:m.id, color:gc(m.group).hex, mod:m};
+    });
+  });
+  return {pos, W, H};
+}
+
+function renderMindmap() {
+  const wrap = document.getElementById('mm-wrap');
+  const svg  = document.getElementById('mm-svg');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  svg.setAttribute('viewBox', `${mmVB.x} ${mmVB.y} ${mmVB.w} ${mmVB.h}`);
+  svg.innerHTML = '';
+
+  const {pos} = mmLayout();
+
+  // Helper: SVG element
+  const el = (tag, attrs, txt) => {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
+    if (txt !== undefined) e.textContent = txt;
+    return e;
+  };
+
+  // defs for filters
+  const defs = el('defs',{});
+  const filt = el('filter',{id:'glow',x:'-20%',y:'-20%',width:'140%',height:'140%'});
+  const fg = el('feGaussianBlur',{stdDeviation:'3',result:'blur'});
+  const fm = el('feMerge',{});
+  const fm1 = el('feMergeNode',{in:'blur'});
+  const fm2 = el('feMergeNode',{in:'SourceGraphic'});
+  fm.appendChild(fm1); fm.appendChild(fm2);
+  filt.appendChild(fg); filt.appendChild(fm);
+  defs.appendChild(filt);
+  svg.appendChild(defs);
+
+  // Background
+  svg.appendChild(el('rect',{x:mmVB.x,y:mmVB.y,width:mmVB.w,height:mmVB.h,fill:'#111318'}));
+
+  // ── Edges: center → groups ──
+  GROUP_ORDER.filter(g=>pos[g]).forEach(g => {
+    const c = pos['__center'], gp = pos[g];
+    svg.appendChild(el('line',{x1:c.x,y1:c.y,x2:gp.x,y2:gp.y,stroke:gc(g).hex,'stroke-width':'2','stroke-opacity':'0.25'}));
+  });
+
+  // ── Edges: groups → modules ──
+  MODS.forEach(m => {
+    const gp = pos[m.group], mp = pos[m.id];
+    if (!gp||!mp) return;
+    svg.appendChild(el('line',{x1:gp.x,y1:gp.y,x2:mp.x,y2:mp.y,stroke:gc(m.group).hex,'stroke-width':'1.5','stroke-opacity':'0.2'}));
+  });
+
+  // ── Dep edges (dashed) ──
+  MODS.forEach(m => {
+    m.deps.forEach(dep => {
+      const from = pos[dep], to = pos[m.id];
+      if (!from||!to) return;
+      svg.appendChild(el('line',{x1:from.x,y1:from.y,x2:to.x,y2:to.y,stroke:'#ffffff','stroke-width':'0.8','stroke-opacity':'0.07','stroke-dasharray':'3 5'}));
+    });
+  });
+
+  // ── Nodes ──
+  function addSVGNode(key, p) {
+    const g = el('g',{style:'cursor:pointer'});
+    g.setAttribute('data-key', key);
+
+    if (p.isCenter) {
+      g.appendChild(el('circle',{cx:p.x,cy:p.y,r:'38',fill:'#1e2330',stroke:'#3b82f6','stroke-width':'2'}));
+      const t = el('text',{x:p.x,y:p.y-5,'text-anchor':'middle','font-family':'Syne, sans-serif','font-size':'13','font-weight':'800',fill:'#e8eaf0'});
+      t.textContent = 'ERP';
+      g.appendChild(t);
+      const t2 = el('text',{x:p.x,y:p.y+10,'text-anchor':'middle','font-family':'Syne, sans-serif','font-size':'9','font-weight':'600',fill:'#6b7394'});
+      t2.textContent = 'System v4';
+      g.appendChild(t2);
+    } else if (p.isGroup) {
+      const words = p.label.split(/\s+/);
+      const lines = [];
+      let line = '';
+      words.forEach(w => { if((line+' '+w).length > 14 && line) { lines.push(line.trim()); line=w; } else line+=' '+w; });
+      if(line.trim()) lines.push(line.trim());
+      const rw = Math.max(...lines.map(l=>l.length))*5.5+16, rh = lines.length*13+12;
+      g.appendChild(el('rect',{x:p.x-rw/2,y:p.y-rh/2,width:rw,height:rh,rx:'6',fill:p.color+'20',stroke:p.color,'stroke-width':'1.5','stroke-opacity':'0.6'}));
+      lines.forEach((ln,i) => {
+        const t = el('text',{x:p.x,y:p.y-(lines.length-1)*6.5+i*13,'text-anchor':'middle','font-family':'DM Mono, monospace','font-size':'8','font-weight':'500',fill:p.color});
+        t.textContent = ln;
+        g.appendChild(t);
+      });
+    } else {
+      // Module node
+      const rw = p.label.length*7+16, rh = 22;
+      g.appendChild(el('rect',{x:p.x-rw/2,y:p.y-rh/2,width:rw,height:rh,rx:'4',fill:p.color+'18',stroke:p.color,'stroke-width':'1','stroke-opacity':'0.5'}));
+      const t = el('text',{x:p.x,y:p.y+4,'text-anchor':'middle','font-family':'DM Mono, monospace','font-size':'9','font-weight':'500',fill:p.color});
+      t.textContent = p.label;
+      g.appendChild(t);
+
+      // hover
+      g.addEventListener('mouseenter', evt => {
+        const m = p.mod;
+        if (!m) return;
+        document.getElementById('tt-name').textContent = m.name;
+        document.getElementById('tt-plan').textContent = `Plan: ${m.plan}  ·  Abhängig von: ${m.deps.join(', ')||'–'}`;
+        document.getElementById('tt-desc').textContent = m.desc + '\n\nFunktionen: ' + m.features.slice(0,5).join(', ') + (m.features.length>5?` +${m.features.length-5} weitere`:'');
+        const tt = document.getElementById('mm-tt');
+        const wr = wrap.getBoundingClientRect();
+        let tx = evt.clientX - wr.left + 16, ty = evt.clientY - wr.top - 20;
+        if (tx+250 > wr.width) tx -= 270;
+        tt.style.left = tx+'px'; tt.style.top = ty+'px'; tt.style.display = 'block';
+      });
+      g.addEventListener('mouseleave', () => { document.getElementById('mm-tt').style.display='none'; });
+    }
+    svg.appendChild(g);
+  }
+
+  Object.entries(pos).forEach(([key,p]) => addSVGNode(key,p));
+
+  // ── Pan & Zoom ──
+  wrap.onwheel = e => {
+    e.preventDefault();
+    const scale = e.deltaY > 0 ? 1.1 : 0.9;
+    const rect = wrap.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const svgX = mmVB.x + mx/wrap.clientWidth*mmVB.w;
+    const svgY = mmVB.y + my/wrap.clientHeight*mmVB.h;
+    mmVB.w *= scale; mmVB.h *= scale;
+    mmVB.x = svgX - mx/wrap.clientWidth*mmVB.w;
+    mmVB.y = svgY - my/wrap.clientHeight*mmVB.h;
+    svg.setAttribute('viewBox',`${mmVB.x} ${mmVB.y} ${mmVB.w} ${mmVB.h}`);
+  };
+
+  wrap.onmousedown = e => { mmDrag.on=true; mmDrag.lx=e.clientX; mmDrag.ly=e.clientY; wrap.classList.add('drag'); };
+  window.onmousemove = e => {
+    if (!mmDrag.on) return;
+    const dx = (e.clientX-mmDrag.lx)/wrap.clientWidth*mmVB.w;
+    const dy = (e.clientY-mmDrag.ly)/wrap.clientHeight*mmVB.h;
+    mmVB.x -= dx; mmVB.y -= dy; mmDrag.lx=e.clientX; mmDrag.ly=e.clientY;
+    svg.setAttribute('viewBox',`${mmVB.x} ${mmVB.y} ${mmVB.w} ${mmVB.h}`);
+  };
+  window.onmouseup = () => { mmDrag.on=false; wrap.classList.remove('drag'); };
+
+  // Touch: drag + pinch-zoom
+  let lastTouches = null;
+  wrap.addEventListener('touchstart', e => { e.preventDefault(); lastTouches = e.touches; }, {passive:false});
+  wrap.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && lastTouches) {
+      const dx = (e.touches[0].clientX - lastTouches[0].clientX) / wrap.clientWidth * mmVB.w;
+      const dy = (e.touches[0].clientY - lastTouches[0].clientY) / wrap.clientHeight * mmVB.h;
+      mmVB.x -= dx; mmVB.y -= dy;
+      svg.setAttribute('viewBox',`${mmVB.x} ${mmVB.y} ${mmVB.w} ${mmVB.h}`);
+    } else if (e.touches.length === 2 && lastTouches && lastTouches.length === 2) {
+      const prevDist = Math.hypot(lastTouches[0].clientX-lastTouches[1].clientX, lastTouches[0].clientY-lastTouches[1].clientY);
+      const newDist  = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+      const scale = prevDist / newDist;
+      const rect = wrap.getBoundingClientRect();
+      const mx = ((e.touches[0].clientX+e.touches[1].clientX)/2) - rect.left;
+      const my = ((e.touches[0].clientY+e.touches[1].clientY)/2) - rect.top;
+      const svgX = mmVB.x + mx/wrap.clientWidth*mmVB.w;
+      const svgY = mmVB.y + my/wrap.clientHeight*mmVB.h;
+      mmVB.w *= scale; mmVB.h *= scale;
+      mmVB.x = svgX - mx/wrap.clientWidth*mmVB.w;
+      mmVB.y = svgY - my/wrap.clientHeight*mmVB.h;
+      svg.setAttribute('viewBox',`${mmVB.x} ${mmVB.y} ${mmVB.w} ${mmVB.h}`);
+    }
+    lastTouches = e.touches;
+  }, {passive:false});
+  wrap.addEventListener('touchend', () => { lastTouches = null; }, {passive:false});
+}
+
+// ══════════════════════════════════════════════════════
+// LANGUAGES
+// ══════════════════════════════════════════════════════
+function renderLangs() {
+  document.getElementById('lang-grid').innerHTML = LANGS.map(l => `
+    <div class="lang-card">
+      <div class="lang-flag">${l.flag}</div>
+      <div class="lang-name">${l.name}</div>
+      <span class="lang-status ${l.status==='done'?'lang-done':l.status==='plan'?'lang-plan':'lang-later'}">${l.sl}</span>
+      <div class="lang-note">${l.note}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+
+// De-duplicate MODS — keep last occurrence of each ID
+const seen = new Set();
+MODS = MODS.slice().reverse().filter(m => seen.has(m.id) ? false : seen.add(m.id)).reverse();
+
+function mobileNav(id, btn) {
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  // also update desktop nav
+  const desktopBtns = document.querySelectorAll('header nav .nb');
+  const labels = ['modules','subscriptions','architecture','roles','phases','mindmap','languages'];
+  desktopBtns.forEach(b => b.classList.remove('on'));
+  const idx = labels.indexOf(id);
+  if (idx >= 0 && desktopBtns[idx]) desktopBtns[idx].classList.add('on');
+  showSection(id, null);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+renderSidebar();
+renderModules();
+renderSubscriptions();
+renderRoles();
+renderPhases();
+renderLangs();
+</script>
+</body>
+</html>
+.view-sub{color:var(--tx3);font-size:12px;margin-bottom:24px;line-height:1.6}
+
+/* ── MODULE CARDS ── */
+.group-section{margin-bottom:36px}
+.group-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.group-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.group-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tx3)}
+.group-cnt{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);margin-left:auto}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.mc{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.mc:hover{border-color:var(--bdr2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.mc.exp{border-color:var(--bdr2)}
+.ctop{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.mid{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:1.5px;padding:2px 6px;border-radius:3px;border:1px solid}
+.plan-b{font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;background:var(--surf2);color:var(--tx3);border:1px solid var(--bdr)}
+.mname{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px}
+.mdesc{font-size:11px;color:var(--tx3);line-height:1.5}
+.mdet{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)}
+.mc.exp .mdet{display:block}
+.dlbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:6px;margin-top:10px}
+.dlbl:first-child{margin-top:0}
+.ftags{display:flex;flex-wrap:wrap;gap:4px}
+.ftag{background:var(--surf2);border:1px solid var(--bdr);padding:2px 6px;border-radius:3px;font-size:10px;color:var(--tx2)}
+.deptags{display:flex;flex-wrap:wrap;gap:4px}
+.deptag{font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid}
+
+/* ── SUBSCRIPTION VIEW ── */
+.sub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:32px}
+.sub-card{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;overflow:hidden}
+.sub-head{padding:16px 18px;border-bottom:1px solid var(--bdr)}
+.sub-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:2px}
+.sub-who{font-size:11px;color:var(--tx3)}
+.sub-body{padding:16px 18px}
+.sub-reason{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:12px;font-style:italic;border-left:2px solid;padding-left:10px}
+.sub-modules{display:flex;flex-wrap:wrap;gap:4px}
+.sub-mod{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;border:1px solid}
+.addon-section{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:18px}
+.addon-intro{font-size:12px;color:var(--tx2);line-height:1.6;margin-bottom:14px}
+.addon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.addon-item{background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:12px 14px}
+.addon-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:3px}
+.addon-why{font-size:11px;color:var(--tx3);line-height:1.5}
+
+/* ── ROLES VIEW ── */
+.roles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.role-card{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px}
+.role-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.role-desc{font-size:11px;color:var(--tx3);line-height:1.5;margin-bottom:12px}
+.role-perms{display:flex;flex-direction:column;gap:4px}
+.perm-row{display:flex;align-items:center;gap:8px;font-size:11px}
+.perm-mod{color:var(--tx2);flex:1}
+.perm-level{font-family:'DM Mono',monospace;font-size:9px;padding:1px 5px;border-radius:2px}
+.perm-full{background:#10b98120;color:#10b981;border:1px solid #10b98140}
+.perm-read{background:#3b82f620;color:#3b82f6;border:1px solid #3b82f640}
+.perm-none{background:var(--surf3);color:var(--tx3);border:1px solid var(--bdr)}
+
+/* ── PHASE PLAN ── */
+.prog-bar{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px 18px;margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.prog-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);white-space:nowrap}
+.prog-track{flex:1;height:5px;background:var(--surf2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#10b981,#3b82f6);border-radius:3px;transition:width .4s ease}
+.prog-pct{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#10b981;min-width:32px;text-align:right}
+.phase-list{display:flex;flex-direction:column;gap:8px}
+.pc{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;overflow:hidden}
+.ph{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;transition:background .15s}
+.ph:hover{background:var(--surf2)}
+.pnum{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3);width:20px;flex-shrink:0}
+.pchk{width:18px;height:18px;border-radius:50%;border:2px solid var(--bdr2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;transition:all .2s}
+.pchk.done{background:#10b981;border-color:#10b981;color:#fff}
+.pinfo{flex:1}
+.pname{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:2px}
+.pmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pdur{font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3)}
+.pmods{display:flex;gap:3px;flex-wrap:wrap}
+.pmod{font-family:'DM Mono',monospace;font-size:9px;padding:1px 5px;border-radius:2px;border:1px solid}
+.pchev{color:var(--tx3);font-size:10px;transition:transform .2s;flex-shrink:0}
+.pc.open .pchev{transform:rotate(90deg)}
+.pbody{display:none;border-top:1px solid var(--bdr);padding:16px;background:var(--surf2)}
+.pc.open .pbody{display:block}
+.tasklist{list-style:none;display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.ti{display:flex;gap:8px;font-size:12px;color:var(--tx2);line-height:1.4}
+.ti::before{content:'—';color:var(--bdr2);flex-shrink:0}
+.presult{padding:8px 12px;border-radius:5px;font-size:11px;font-weight:500;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#6ee7b7}
+.presult::before{content:'✓ Ergebnis: ';font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase}
+
+/* ── MINDMAP ── */
+#mm-wrap{width:100%;height:calc(100vh - 130px);border:1px solid var(--bdr);border-radius:10px;background:var(--surf);overflow:hidden;position:relative;cursor:grab}
+#mm-wrap.drag{cursor:grabbing}
+#mm-svg{width:100%;height:100%;display:block}
+
+/* ── LANGUAGES ── */
+.lang-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.lang-card{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px}
+.lang-flag{font-size:24px;margin-bottom:8px}
+.lang-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.lang-status{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;margin-bottom:8px;display:inline-block}
+.lang-done{background:#10b98120;color:#10b981;border:1px solid #10b98140}
+.lang-plan{background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40}
+.lang-later{background:var(--surf2);color:var(--tx3);border:1px solid var(--bdr)}
+.lang-note{font-size:11px;color:var(--tx3);line-height:1.5}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+
+/* ── MOBILE ── */
+@media (max-width:768px){
+  html,body{overflow:auto;height:auto;min-height:100vh;padding-bottom:70px}
+  .main{flex-direction:column;overflow:visible;height:auto}
+  .sidebar{display:none!important}
+  .content{overflow:visible;padding:14px 14px 20px;height:auto}
+  header{padding:0 14px;height:52px;gap:8px}
+  header nav{display:none}
+  .logo{font-size:14px}
+  .vtag{display:none}
+  .view-title{font-size:18px}
+  .view-sub{font-size:11px;margin-bottom:16px}
+  .mgrid{grid-template-columns:1fr}
+  .sub-grid{grid-template-columns:1fr}
+  .roles-grid{grid-template-columns:1fr}
+  .lang-grid{grid-template-columns:1fr 1fr}
+  .addon-grid{grid-template-columns:1fr}
+  #mm-wrap{height:65vw;min-height:280px}
+  .prog-bar{gap:10px}
+  .prog-lbl{font-size:9px}
+
+  /* Bottom tab bar for mobile */
+  .mobile-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;
+    background:var(--surf);border-top:1px solid var(--bdr);
+    padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+  }
+  .mobile-nav-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:6px 4px;border:none;background:transparent;color:var(--tx3);
+    font-family:'DM Sans',sans-serif;font-size:9px;font-weight:500;cursor:pointer;
+    border-radius:6px;transition:all .15s;
+  }
+  .mobile-nav-btn .mnicon{font-size:18px;line-height:1}
+  .mobile-nav-btn.on{color:#3b82f6}
+  .mobile-nav-btn.on .mnicon{filter:drop-shadow(0 0 4px #3b82f6)}
+}
+@media (min-width:769px){
+  .mobile-nav{display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><em>ERP</em> Modularer Projektplan</div>
+  <nav>
+    <button class="nb on" onclick="showSection('modules',this)">Module</button>
+    <button class="nb" onclick="showSection('subscriptions',this)">Abos</button>
+    <button class="nb" onclick="showSection('architecture',this)">Architektur</button>
+    <button class="nb" onclick="showSection('roles',this)">Rollen</button>
+    <button class="nb" onclick="showSection('phases',this)">Phasen</button>
+    <button class="nb" onclick="showSection('mindmap',this)">Mindmap</button>
+    <button class="nb" onclick="showSection('languages',this)">Sprachen</button>
+  </nav>
+  <span class="vtag">v4.0 · April 2026</span>
+</header>
+
+<!-- Mobile bottom nav (iPhone/iPad) -->
+<div class="mobile-nav">
+  <button class="mobile-nav-btn on" onclick="mobileNav('modules',this)"><span class="mnicon">⬛</span>Module</button>
+  <button class="mobile-nav-btn" onclick="mobileNav('subscriptions',this)"><span class="mnicon">💳</span>Abos</button>
+  <button class="mobile-nav-btn" onclick="mobileNav('architecture',this)"><span class="mnicon">🔀</span>Architektur</button>
+  <button class="mobile-nav-btn" onclick="mobileNav('roles',this)"><span class="mnicon">👤</span>Rollen</button>
+  <button class="mobile-nav-btn" onclick="mobileNav('phases',this)"><span class="mnicon">📋</span>Phasen</button>
+  <button class="mobile-nav-btn" onclick="mobileNav('mindmap',this)"><span class="mnicon">🕸️</span>Mindmap</button>
+  <button class="mobile-nav-btn" onclick="mobileNav('languages',this)"><span class="mnicon">🌐</span>Sprachen</button>
+</div>
+
+<div class="main">
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Gruppen</div>
+    <div id="sidebar-groups"></div>
+  </div>
+</div>
+
+<!-- ══════════ CONTENT ══════════ -->
+<div class="content">
+
+<!-- MODULE OVERVIEW -->
+<div id="sec-modules" class="view on">
+  <div class="view-title">Modul-Übersicht</div>
+  <div class="view-sub">Klick auf eine Karte für Details · Sidebar zum Filtern nach Gruppe</div>
+  <div id="module-groups"></div>
+
+  <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;overflow:hidden;margin-top:32px">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between">
+      <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700">+ Neues Modul hinzufügen</span>
+      <span style="font-size:11px;color:var(--tx3)">Wird sofort in Übersicht und Mindmap übernommen</span>
+    </div>
+    <div style="padding:16px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Modul-ID</div><input id="ni" style="width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:7px 9px;color:var(--tx);font-size:12px;outline:none" placeholder="z.B. FLEET" maxlength="8"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Name</div><input id="nn" style="width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:7px 9px;color:var(--tx);font-size:12px;outline:none" placeholder="z.B. Flottenmanagement"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Gruppe</div><select id="ng" style="width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:7px 9px;color:var(--tx);font-size:12px;outline:none"><option>Core & System</option><option>Warenwirtschaft</option><option>Produktion & Commerce</option><option>Rechnungswesen & Finanzen</option><option>CRM, Marketing & Vertrieb</option><option>Personal & Organisation</option><option>Qualität, Support & Assets</option><option>Analyse & Reporting</option><option>Plattform</option></select></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Plan-Tier</div><select id="np" style="width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:7px 9px;color:var(--tx);font-size:12px;outline:none"><option>Basis</option><option>Handel</option><option>Commerce</option><option>Business</option><option>Enterprise</option><option>Add-on</option><option>Plattform</option></select></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Abhängig von</div><input id="nd" style="width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:7px 9px;color:var(--tx);font-size:12px;outline:none" placeholder="CORE, LAGER"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Kurzbeschreibung</div><input id="nds" style="width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:7px 9px;color:var(--tx);font-size:12px;outline:none" placeholder="Was macht dieses Modul?"></div>
+      <div style="grid-column:1/-1"><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Funktionen (kommasepariert)</div><textarea id="nf" style="width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:7px 9px;color:var(--tx);font-size:12px;outline:none;resize:vertical;min-height:60px" placeholder="Funktion 1, Funktion 2, Funktion 3 ..."></textarea></div>
+      <div style="grid-column:1/-1"><button onclick="addModule()" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;border-radius:5px;padding:9px 18px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer">Modul hinzufügen</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBSCRIPTIONS -->
+<div id="sec-subscriptions" class="view">
+  <div class="view-title">Abos & Pakete</div>
+  <div class="view-sub">5 Stufen · jede Stufe baut auf der vorherigen auf · Basis = Fundament für alle · Hover über Modul-Tags für Begründung</div>
+
+  <div class="sub-grid" id="sub-grid"></div>
+
+  <div style="background:var(--surf);border:1px solid #10b98140;border-left:3px solid #10b981;border-radius:8px;padding:16px 18px;margin-bottom:28px">
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;color:#10b981">Verkaufskanäle — wie POS, Webshop & Gastro zusammenspielen</div>
+    <div style="font-size:12px;color:var(--tx2);line-height:1.8">
+      <strong style="color:var(--tx)">VERK (Verkauf)</strong> ist die <em>Datenebene</em> — hier landen alle Verkaufsvorgänge, egal woher. Aufträge, Lieferscheine, Rechnungen. Einzige Quelle der Wahrheit für Reporting und Buchhaltung.<br><br>
+      <strong style="color:var(--tx)">POS</strong> ist ein <em>Eingangskanal</em> → erzeugt einen Verkauf in VERK. POS = Touch-UI + Zahlungsterminal + Bondruck. Der Auftrag und Lagerabgang laufen über VERK.<br>
+      <strong style="color:var(--tx)">SHOP (Webshop)</strong> ist ein <em>Eingangskanal</em> → Online-Bestellungen werden automatisch als Auftrag in VERK übernommen. Lagerreservierung direkt bei Checkout.<br>
+      <strong style="color:var(--tx)">GAST (Gastro)</strong> ist ein <em>Eingangskanal</em> → Tischbestellungen erzeugen am Ende eine Rechnung in VERK.<br><br>
+      Alle Kanäle → <strong style="color:#10b981">VERK</strong> → Lagerabgang → Rechnung → <strong style="color:#ef4444">FIBU</strong>. Im Reporting siehst du den Kanal: <code style="background:var(--surf2);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px">POS | Webshop | Gastro | Manuell</code>
+    </div>
+  </div>
+
+  <div style="background:var(--surf);border:1px solid #a78bfa40;border-left:3px solid #a78bfa;border-radius:8px;padding:16px 18px;margin-bottom:28px">
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;color:#a78bfa">SaaS-Plattform — warum ein eigenes System?</div>
+    <div style="font-size:12px;color:var(--tx2);line-height:1.8">
+      Das ERP-System läuft für <strong style="color:var(--tx)">dein Modeunternehmen</strong> als Tenant A — mit deinen Filialen, deiner Produktion, deinem Webshop.<br>
+      Die <strong style="color:var(--tx)">Plattform-Verwaltung</strong> (andere Kunden onboarden, Billing, Mandanten sperren) ist ein komplett separates Admin-Interface.<br><br>
+      <strong style="color:#a78bfa">Technisch:</strong> ein Repo, eine Codebase, eine Datenbank. Aber eigene Routen (<code style="background:var(--surf2);padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px">/platform-admin/</code>), eigene Auth und ein eigenes UI — das nie ein Tenant zu sehen bekommt.<br>
+      <strong style="color:#a78bfa">Konzeptionell:</strong> zwei Produkte. Dein ERP und die ERP-Plattform die du an andere vermietest. Sauber getrennt, kein Mischen von Geschäftsdaten und Plattform-Verwaltung.
+    </div>
+  </div>
+
+  <div class="view-title" style="font-size:16px;margin-bottom:4px">Add-ons</div>
+  <div class="view-sub" style="margin-bottom:14px">Zubuchbar zu jedem Paket · Zu spezifisch für einen festen Plan · Zahlung nur wenn wirklich genutzt</div>
+  <div class="addon-section">
+    <div class="addon-intro">Add-ons sind Funktionen, die nicht jedes Unternehmen braucht — ein Metzger braucht kein Social-Media-Modul, ein Modebrand schon. Deshalb werden sie separat abgerechnet und können jederzeit dazugebucht oder gekündigt werden.</div>
+    <div class="addon-grid" id="addon-grid"></div>
+  </div>
+</div>
+
+<!-- ROLES -->
+<div id="sec-roles" class="view">
+  <div class="view-title">Rollen & Berechtigungen</div>
+  <div class="view-sub">Granulare Rechtevergabe pro Modul · Kein Kassierer sieht Rohertrag aller Filialen · Kein Einkäufer sieht Gehaltsabrechnungen</div>
+
+  <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px;margin-bottom:24px;font-size:12px;color:var(--tx2);line-height:1.7">
+    <strong style="color:var(--tx);font-family:'Syne',sans-serif">Drei-Ebenen-Modell:</strong><br>
+    <strong style="color:#3b82f6">Systemebene</strong> — Super-Admin (Plattforminhaber) und Tenant-Admin (Unternehmensinhaber) haben vollen Zugriff auf alle Module ihres Tenants.<br>
+    <strong style="color:#10b981">Abteilungsebene</strong> — Rollen wie Kassierer, Einkäufer, Buchhalter haben nur Zugriff auf ihr Modul. Innerhalb des Moduls kann lesend oder schreibend differenziert werden.<br>
+    <strong style="color:#f59e0b">Leseebene</strong> — Controlling, Management darf Reports sehen aber nichts bearbeiten. Separate "Read-Only"-Rolle pro Modul möglich.
+  </div>
+
+  <div class="roles-grid" id="roles-grid"></div>
+</div>
+
+<!-- PHASES -->
+<div id="sec-phases" class="view">
+  <div class="view-title">Phasenplan</div>
+  <div class="view-sub">18 Phasen inkl. Design-System und UI/UX-Phase · Abhaken wenn erledigt · Stand wird gespeichert</div>
+  <div class="prog-bar">
+    <span class="prog-lbl">FORTSCHRITT</span>
+    <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+    <span class="prog-pct" id="pp">0%</span>
+  </div>
+  <div class="phase-list" id="phase-list"></div>
+</div>
+
+<!-- MINDMAP — pure SVG, no DOM/SVG split -->
+<div id="sec-mindmap" class="view">
+  <div class="view-title">Modul-Mindmap</div>
+  <div class="view-sub">Alle Module und Abhängigkeiten · Scroll zum Zoomen · Drag zum Verschieben · Hover für Details</div>
+  <div id="mm-wrap">
+    <svg id="mm-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="mm-tt" style="position:absolute;background:#181c24;border:1px solid #2a3048;border-radius:8px;padding:12px 14px;font-size:11px;max-width:240px;z-index:50;pointer-events:none;display:none;line-height:1.6;color:#e8eaf0">
+      <div id="tt-name" style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px"></div>
+      <div id="tt-plan" style="font-family:'DM Mono',monospace;font-size:9px;color:#6b7394;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px"></div>
+      <div id="tt-desc" style="color:#9ba3c2;font-size:11px"></div>
+    </div>
+    <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:9px;color:#6b7394;letter-spacing:1px;pointer-events:none">SCROLL · DRAG · HOVER</div>
+  </div>
+</div>
+
+<!-- LANGUAGES -->
+<div id="sec-languages" class="view">
+  <div class="view-title">Mehrsprachigkeit (i18n)</div>
+  <div class="view-sub">i18n von Anfang an einbauen — nicht nachträglich · JSON-Übersetzungsdateien pro Sprache · Alle UI-Texte über Schlüssel</div>
+
+  <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px;margin-bottom:24px;font-size:12px;color:var(--tx2);line-height:1.7;max-width:760px">
+    <strong style="color:var(--tx);font-family:'Syne',sans-serif">Warum i18n von Anfang an?</strong><br>
+    Wenn du Texte später internationalisierst, musst du durch jede Zeile Code. Wenn du i18n von Anfang an mit <code style="background:var(--surf2);padding:1px 4px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px">next-intl</code> oder <code style="background:var(--surf2);padding:1px 4px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px">i18next</code> einbaust, ist der Aufwand minimal. Jeder UI-String bekommt einen Schlüssel (<code style="background:var(--surf2);padding:1px 4px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px">t('nav.purchase')</code>), die Übersetzungen liegen in <code style="background:var(--surf2);padding:1px 4px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px">/locales/de.json</code>, <code style="background:var(--surf2);padding:1px 4px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px">/locales/en.json</code> usw. Das kostet in Phase 1 etwa 2–3 Stunden Setup und spart später Wochen.
+  </div>
+
+  <div class="lang-grid" id="lang-grid"></div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div id="sec-architecture" class="view">
+  <div class="view-title">System-Architektur</div>
+  <div class="view-sub">Wie Verkaufskanäle, Module und Datenflüsse zusammenhängen · Alle Kanäle landen in VERK als einheitlicher Wahrheit</div>
+
+  <!-- SALES CHANNEL FLOW -->
+  <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:20px;margin-bottom:20px">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px">Verkaufskanal-Architektur</div>
+    <div style="font-size:11px;color:var(--tx3);margin-bottom:20px">POS, Webshop und manuelle Aufträge sind Eingabekanäle — alle erzeugen Belege im VERK-Modul</div>
+    <div id="arch-channels" style="overflow-x:auto">
+      <svg viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;display:block;margin:0 auto">
+        <!-- Channels -->
+        <rect x="30" y="20" width="150" height="70" rx="8" fill="#10b98115" stroke="#10b981" stroke-width="1.5"/>
+        <text x="105" y="48" text-anchor="middle" font-family="Syne, sans-serif" font-size="13" font-weight="700" fill="#10b981">POS</text>
+        <text x="105" y="64" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">Touch-Kasse</text>
+        <text x="105" y="78" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">Stationärer Verkauf</text>
+
+        <rect x="325" y="20" width="150" height="70" rx="8" fill="#8b5cf615" stroke="#8b5cf6" stroke-width="1.5"/>
+        <text x="400" y="48" text-anchor="middle" font-family="Syne, sans-serif" font-size="13" font-weight="700" fill="#8b5cf6">SHOP</text>
+        <text x="400" y="64" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">Online-Checkout</text>
+        <text x="400" y="78" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">Webshop-Bestellung</text>
+
+        <rect x="620" y="20" width="150" height="70" rx="8" fill="#ec489915" stroke="#ec4899" stroke-width="1.5"/>
+        <text x="695" y="48" text-anchor="middle" font-family="Syne, sans-serif" font-size="13" font-weight="700" fill="#ec4899">MANUELL</text>
+        <text x="695" y="64" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">B2B-Aufträge</text>
+        <text x="695" y="78" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">Angebote → Aufträge</text>
+
+        <!-- Arrows down -->
+        <line x1="105" y1="90" x2="105" y2="130" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.5" marker-end="url(#arr-green)"/>
+        <line x1="400" y1="90" x2="400" y2="130" stroke="#8b5cf6" stroke-width="1.5" stroke-opacity="0.5" marker-end="url(#arr-purple)"/>
+        <line x1="695" y1="90" x2="695" y2="130" stroke="#ec4899" stroke-width="1.5" stroke-opacity="0.5" marker-end="url(#arr-pink)"/>
+
+        <!-- Labels on arrows -->
+        <text x="115" y="117" font-family="DM Mono, monospace" font-size="9" fill="#10b981" opacity="0.7">erzeugt Rechnung</text>
+        <text x="410" y="117" font-family="DM Mono, monospace" font-size="9" fill="#8b5cf6" opacity="0.7">erzeugt Auftrag</text>
+        <text x="705" y="117" font-family="DM Mono, monospace" font-size="9" fill="#ec4899" opacity="0.7">erzeugt Angebot/AB</text>
+
+        <!-- VERK center box -->
+        <rect x="250" y="140" width="300" height="80" rx="10" fill="#3b82f620" stroke="#3b82f6" stroke-width="2"/>
+        <text x="400" y="168" text-anchor="middle" font-family="Syne, sans-serif" font-size="16" font-weight="800" fill="#3b82f6">VERK</text>
+        <text x="400" y="185" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#9ba3c2">Zentrale Belegmaschine</text>
+        <text x="400" y="200" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#6b7394">Angebot · Auftrag · Lieferschein · Rechnung · Gutschrift</text>
+
+        <!-- Lines from channels to VERK -->
+        <line x1="105" y1="132" x2="250" y2="175" stroke="#10b981" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="4 3"/>
+        <line x1="400" y1="132" x2="400" y2="140" stroke="#8b5cf6" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="4 3"/>
+        <line x1="695" y1="132" x2="550" y2="175" stroke="#ec4899" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="4 3"/>
+
+        <!-- VERK → downstream -->
+        <line x1="300" y1="220" x2="180" y2="260" stroke="#ef4444" stroke-width="1.5" stroke-opacity="0.5" marker-end="url(#arr-red)"/>
+        <line x1="400" y1="220" x2="400" y2="260" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.5" marker-end="url(#arr-green2)"/>
+        <line x1="500" y1="220" x2="620" y2="260" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.5" marker-end="url(#arr-amber)"/>
+
+        <!-- Downstream boxes -->
+        <rect x="80" y="268" width="200" height="52" rx="6" fill="#ef444415" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="180" y="289" text-anchor="middle" font-family="Syne, sans-serif" font-size="12" font-weight="700" fill="#ef4444">FIBU</text>
+        <text x="180" y="305" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">Buchung · USt · DATEV</text>
+
+        <rect x="300" y="268" width="200" height="52" rx="6" fill="#10b98115" stroke="#10b981" stroke-width="1.5"/>
+        <text x="400" y="289" text-anchor="middle" font-family="Syne, sans-serif" font-size="12" font-weight="700" fill="#10b981">LAGER</text>
+        <text x="400" y="305" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">Bestandsabgang · Reservierung</text>
+
+        <rect x="520" y="268" width="200" height="52" rx="6" fill="#f97316 15" stroke="#f97316" stroke-width="1.5"/>
+        <text x="620" y="289" text-anchor="middle" font-family="Syne, sans-serif" font-size="12" font-weight="700" fill="#f97316">REP</text>
+        <text x="620" y="305" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6b7394">Umsatz nach Kanal · POS / Shop / B2B</text>
+
+        <!-- Arrow markers -->
+        <defs>
+          <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#10b981" opacity="0.6"/></marker>
+          <marker id="arr-green2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#10b981" opacity="0.6"/></marker>
+          <marker id="arr-purple" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#8b5cf6" opacity="0.6"/></marker>
+          <marker id="arr-pink" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#ec4899" opacity="0.6"/></marker>
+          <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#ef4444" opacity="0.6"/></marker>
+          <marker id="arr-amber" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#f97316" opacity="0.6"/></marker>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- SAAS SEPARATION -->
+  <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:20px;margin-bottom:20px">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px">SaaS-Trennung: Zwei Systeme, eine Codebasis</div>
+    <div style="font-size:11px;color:var(--tx3);margin-bottom:20px">Das ERP und das Plattform-Admin sind technisch verwandt aber konzeptionell getrennt</div>
+    <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;display:block;margin:0 auto">
+      <!-- ERP Box -->
+      <rect x="30" y="20" width="340" height="160" rx="10" fill="#10b98108" stroke="#10b981" stroke-width="1.5"/>
+      <text x="200" y="50" text-anchor="middle" font-family="Syne, sans-serif" font-size="14" font-weight="800" fill="#10b981">ERP · erp.deinedomain.de</text>
+      <text x="200" y="68" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#6b7394">Du als Tenant A · Kunden als Tenant B, C, D ...</text>
+      <rect x="50" y="82" width="90" height="34" rx="5" fill="#10b98118" stroke="#10b981" stroke-width="1"/>
+      <text x="95" y="101" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#10b981">Dein Business</text>
+      <text x="95" y="112" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" fill="#6b7394">Tenant A</text>
+      <rect x="155" y="82" width="90" height="34" rx="5" fill="#3b82f618" stroke="#3b82f6" stroke-width="1"/>
+      <text x="200" y="101" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#3b82f6">Kunde B</text>
+      <text x="200" y="112" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" fill="#6b7394">Tenant B</text>
+      <rect x="260" y="82" width="90" height="34" rx="5" fill="#8b5cf618" stroke="#8b5cf6" stroke-width="1"/>
+      <text x="305" y="101" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#8b5cf6">Kunde C</text>
+      <text x="305" y="112" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" fill="#6b7394">Tenant C</text>
+      <text x="200" y="155" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#9ba3c2">Alle Tenants sehen nur ihre eigenen Daten</text>
+      <text x="200" y="170" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#9ba3c2">Vollständige Mandantentrennung in der DB</text>
+
+      <!-- Platform Admin Box -->
+      <rect x="430" y="20" width="340" height="160" rx="10" fill="#a78bfa08" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <text x="600" y="50" text-anchor="middle" font-family="Syne, sans-serif" font-size="14" font-weight="800" fill="#a78bfa">Plattform-Admin · admin.deinedomain.de</text>
+      <text x="600" y="68" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" fill="#6b7394">NUR du · Eigener Auth-Layer · Nicht im ERP sichtbar</text>
+      <rect x="450" y="82" width="260" height="60" rx="5" fill="#a78bfa10" stroke="#a78bfa" stroke-width="1"/>
+      <text x="580" y="106" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#a78bfa">Alle Tenants · MRR · Fehler-Logs</text>
+      <text x="580" y="122" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#a78bfa">Module aktivieren · Mandanten sperren</text>
+      <text x="600" y="155" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#9ba3c2">Liest ERP-Daten per interner API</text>
+      <text x="600" y="170" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#9ba3c2">Stripe-Webhooks aktualisieren TenantModule-Tabelle</text>
+
+      <!-- Arrow between -->
+      <line x1="370" y1="100" x2="430" y2="100" stroke="#a78bfa" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 3" marker-end="url(#arr-plat)"/>
+      <text x="400" y="93" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" fill="#6b7394">interne API</text>
+      <defs><marker id="arr-plat" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 Z" fill="#a78bfa" opacity="0.5"/></marker></defs>
+    </svg>
+  </div>
+
+  <!-- KEY DECISIONS -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+    <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:#10b981">✓ POS vs. VERK</div>
+      <div style="font-size:11px;color:var(--tx2);line-height:1.7"><strong>POS</strong> ist die Touch-Oberfläche an der Kasse — schnelle Eingabe, Bon-Druck, Offline-Strategie. <strong>VERK</strong> ist die Belegmaschine dahinter. Jeder POS-Verkauf erzeugt intern einen Beleg in VERK. Im Reporting siehst du dann "Kanal: POS" vs. "Kanal: Webshop" vs. "Kanal: Auftrag".</div>
+    </div>
+    <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:#8b5cf6">✓ Webshop-Bestellungen</div>
+      <div style="font-size:11px;color:var(--tx2);line-height:1.7"><strong>SHOP</strong> ist die Eingabemaske für Online-Bestellungen. Wenn ein Kunde bestellt, entsteht ein Auftrag in VERK. LAGER bucht den Bestand ab. DMS generiert die Rechnung. Der Kunde bekommt eine E-Mail. Alles in einem Datenfluss.</div>
+    </div>
+    <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:#f59e0b">✓ Produktion als Add-on</div>
+      <div style="font-size:11px;color:var(--tx2);line-height:1.7">Ein Einzelhändler mit eigener Fertigung ist kein Enterprise-Kunde. <strong>PROD</strong> ist jetzt ein Add-on zubuchbar ab Handel-Plan. Du zahlst nur für Produktion wenn du produzierst — nicht weil du viele Filialen hast.</div>
+    </div>
+    <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:#a78bfa">✓ SaaS getrennt</div>
+      <div style="font-size:11px;color:var(--tx2);line-height:1.7">Das ERP ist dein Produkt für alle Kunden (inkl. dich). Das Plattform-Admin ist ein separates Mini-Interface nur für dich. Du loggst dich dort ein um Tenants zu managen — nicht im ERP. Klare Trennung, bessere Sicherheit.</div>
+    </div>
+    <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:#06b6d4">✓ Messaging vs. Helpdesk</div>
+      <div style="font-size:11px;color:var(--tx2);line-height:1.7"><strong>MSG</strong> (Internes Messaging) ist für Kommunikation zwischen Mitarbeitern — wie Slack intern. <strong>HELP</strong> (Helpdesk) ist für Kundenkontakt — Tickets, SLA, E-Mail-Integration. Die zwei berühren sich nicht.</div>
+    </div>
+    <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:16px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:#ef4444">✓ Basis neu definiert</div>
+      <div style="font-size:11px;color:var(--tx2);line-height:1.7">Basis enthält jetzt <strong>LAGER, EINK und VERK</strong> — weil auch Tischler, Handwerker und Soloselbstständige Material einkaufen und lagern. Was fehlt ist nur die <strong>Touch-Kasse (POS)</strong> — die kommt erst mit Handel rein, weil nur Läden mit Verkaufstheke eine Kasse brauchen.</div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+// ══════════════════════════════════════════════════════
+// COLOR PALETTE
+// ══════════════════════════════════════════════════════
+const GC = {
+  'Core & System':              {hex:'#3b82f6',dim:'rgba(59,130,246,.12)'},
+  'Warenwirtschaft':            {hex:'#10b981',dim:'rgba(16,185,129,.12)'},
+  'Produktion & Commerce':      {hex:'#f59e0b',dim:'rgba(245,158,11,.12)'},
+  'Rechnungswesen & Finanzen':  {hex:'#ef4444',dim:'rgba(239,68,68,.12)'},
+  'CRM, Marketing & Vertrieb':  {hex:'#ec4899',dim:'rgba(236,72,153,.12)'},
+  'Personal & Organisation':    {hex:'#06b6d4',dim:'rgba(6,182,212,.12)'},
+  'Qualität, Support & Assets': {hex:'#84cc16',dim:'rgba(132,204,22,.12)'},
+  'Analyse & Reporting':        {hex:'#f97316',dim:'rgba(249,115,22,.12)'},
+  'Plattform':                  {hex:'#a78bfa',dim:'rgba(167,139,250,.12)'},
+};
+
+// ══════════════════════════════════════════════════════
+// MODULE DATA
+// ══════════════════════════════════════════════════════
+let MODS = [
+  {id:'CORE', name:'Core System',               group:'Core & System',              plan:'Alle',        deps:[],                   desc:'Grundsystem: Mandanten, Filialen, Rollen, Audit', features:['Mandantenverwaltung','Filialverwaltung','Benutzerverwaltung','Rollen & Rechte','Modulverwaltung','Systemeinstellungen','Länder & Steuersätze','Nummernkreise','Währungen','i18n-Grundstruktur','Audit-Log','Systemprotokolle']},
+  {id:'DS',   name:'Design System & UI/UX',     group:'Core & System',              plan:'Alle',        deps:[],                   desc:'Design-Tokens, Komponentenbibliothek, Style Guide', features:['Design-Token-System (Farben, Typografie, Spacing)','Komponentenbibliothek','Responsive Layout-System','Dark/Light Mode','Ikonografie','Accessibility (WCAG 2.1 AA)','Style Guide Dokumentation','Sidebar & Navigation','Modul-übergreifende UI-Muster']},
+  {id:'STAM', name:'Stammdaten',                group:'Core & System',              plan:'Alle',        deps:['CORE'],             desc:'Zentrale Datenbasis für alle anderen Module', features:['Artikelstammdaten','Varianten (Größe, Farbe, Material)','Kategorien & Tags','Kunden','Lieferanten','Preislisten','Einheiten','Marken','Steuerklassen','Zahlungsbedingungen','Versandarten']},
+  {id:'I18N', name:'Mehrsprachigkeit (i18n)',    group:'Core & System',              plan:'Alle',        deps:['CORE'],             desc:'Vollständige Internationalisierung der gesamten Oberfläche', features:['next-intl oder i18next Grundstruktur','/locales/de.json, /locales/en.json','Sprachumschaltung im Benutzer-Profil','Tenant-Standardsprache','Datumsformate & Zahlenformate','RTL-Grundlage vorbereiten','Admin-Übersetzungsverwaltung']},
+  {id:'LAGER',name:'Lager & Logistik',          group:'Warenwirtschaft',            plan:'Basis',       deps:['STAM'],             desc:'Bestand, Warenbewegungen, Lagerorte — auch für Handwerker und Produzenten', features:['Bestände pro Filiale','Lagerorte & Lagerplätze','Mindestbestände','Reservierungen','Warenbewegungslog','Inventur','Umlagerungen','Kommissionierung','Chargen (optional)','Seriennummern (optional)','ABC-Analyse','Lagerwert-Report']},
+  {id:'EINK', name:'Einkauf',                   group:'Warenwirtschaft',            plan:'Basis',       deps:['STAM','LAGER'],     desc:'Lieferantenbestellungen, Wareneingänge, Einkaufspreise', features:['Lieferantenbestellungen','Einkaufspreise & Staffelpreise','Wareneingänge','Teillieferungen','Rücklieferungen','Lieferantenartikelnummern','Bestellvorschläge','Rechnungsprüfung vorbereiten']},
+  {id:'VERK', name:'Verkauf / Aufträge',         group:'Warenwirtschaft',            plan:'Basis',       deps:['STAM'],             desc:'Angebote, manuelle Aufträge, Rechnungen — auch für Freelancer ohne Lager', features:['Angebote','Aufträge & AB','Lieferscheine (optional)','Rechnungen','Gutschriften','Belegnummern (GoBD)','Steuerberechnung','Rabatte & Preisregeln','Kundenpreise','Lagerreservierung (wenn LAGER aktiv)']},
+  {id:'POS',  name:'Kassensystem (POS)',         group:'Warenwirtschaft',            plan:'Handel',      deps:['VERK','LAGER'],     desc:'Touch-Kasse, Zahlungsarten, Tagesabschluss — nur für stationäre Läden', features:['Touch-Kassenoberfläche','Artikelsuche','Warenkorb','Bar-, Karten-, Gutscheinzahlung','Storno & Retoure','Belegdruck','Tagesabschluss','Kassenbuch-Anbindung','Offline-Strategie','TSE/GoBD vorbereiten']},
   {id:'DISPO',name:'Absatzplanung & Dispo',      group:'Warenwirtschaft',            plan:'Business',    deps:['LAGER','VERK'],     desc:'Forecasting, Bestellvorschläge, Varianten-Disposition', features:['Historische Verkaufsauswertung','Forecast-Algorithmus (gleitender Ø)','Automatische Bestellvorschläge','Varianten-Disposition (Größen/Farben)','Reichweiten-Analyse','Saisonplanung','Mindestbestand automatisch anpassen']},
   {id:'PROD', name:'Produktion',                 group:'Produktion & Commerce',      plan:'Business',    deps:['STAM','LAGER','EINK'],desc:'Stücklisten, Fertigungsaufträge, Kalkulation', features:['Stücklisten (BOM)','Arbeitspläne & Fertigungsschritte','Produktionsaufträge','Materialbedarf berechnen','Materialreservierung','Verbrauchsbuchung','Fertigwarenzugang','Ausschuss & Fehlerware','Produktionskalkulation (Soll/Ist)','Variantenproduktion','Chargenverfolgung / Lot-Tracking']},
   {id:'SHOP', name:'Online-Shop',                group:'Produktion & Commerce',      plan:'Commerce',    deps:['STAM','LAGER','VERK'],desc:'Shop-Frontend, Warenkorb, Bestellungen, SEO', features:['Shop-Frontend (Next.js SSR)','Produktliste & Suche & Filter','Warenkorb & Checkout','Lager-Reservierungs-Lock','Bestellverwaltung Admin','E-Mail-Bestätigungen','Retourenmanagement','Kundenkonto (optional)','SEO (Schema.org, Sitemap)','Stripe-Checkout']},
