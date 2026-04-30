@@ -152,6 +152,14 @@ nav{display:flex;gap:2px}
 .presult{padding:8px 12px;border-radius:5px;font-size:11px;font-weight:500;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#6ee7b7}
 .presult::before{content:'✓ Ergebnis: ';font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase}
 
+/* Task checkboxes */
+.ti-check{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--tx2);line-height:1.5;cursor:pointer;padding:3px 0;border-radius:4px;transition:background .1s}
+.ti-check:hover{background:var(--surf3);padding-left:4px;margin-left:-4px}
+.ti-done span{opacity:.4;text-decoration:line-through}
+.ti-box{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--bdr2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;transition:all .15s;cursor:pointer}
+.ti-box.done{background:#10b981;border-color:#10b981;color:#fff}
+.prog-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);white-space:nowrap}
+
 /* ── MINDMAP ── */
 #mm-wrap{width:100%;height:calc(100vh - 130px);border:1px solid var(--bdr);border-radius:10px;background:var(--surf);overflow:hidden;position:relative;cursor:grab}
 #mm-wrap.drag{cursor:grabbing}
@@ -340,6 +348,7 @@ nav{display:flex;gap:2px}
     <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
     <span class="prog-pct" id="pp">0%</span>
   </div>
+  <div style="margin-bottom:16px;padding:0 2px"><span class="prog-sub" id="prog-sub">0 von 0 Schritten · 0 von 9 Phasen abgeschlossen</span></div>
   <div class="phase-list" id="phase-list"></div>
 </div>
 
@@ -1229,33 +1238,79 @@ function renderRoles() {
 // ══════════════════════════════════════════════════════
 // PHASES
 // ══════════════════════════════════════════════════════
-const done = new Set(JSON.parse(localStorage.getItem('erp-done')||'[]'));
-function saveDone() { try{localStorage.setItem('erp-done',JSON.stringify([...done]))}catch(e){} }
+const donePh  = new Set(JSON.parse(localStorage.getItem('erp-done-ph')||'[]'));
+const doneTsk = JSON.parse(localStorage.getItem('erp-done-tsk')||'{}'); // {phaseN: [taskIdx,...]}
+
+function saveDone() {
+  try {
+    localStorage.setItem('erp-done-ph',  JSON.stringify([...donePh]));
+    localStorage.setItem('erp-done-tsk', JSON.stringify(doneTsk));
+  } catch(e) {}
+}
+
+function totalTasks()  { return PHASES.reduce((s,p) => s + p.tasks.length, 0); }
+function doneTasks()   { return Object.values(doneTsk).reduce((s,arr) => s + arr.length, 0); }
 
 function renderPhases() {
   const list = document.getElementById('phase-list');
   list.innerHTML = '';
+
   PHASES.forEach(ph => {
-    const isDone = done.has(ph.n);
-    const div = document.createElement('div');
-    div.className = 'pc';
+    const phDone   = donePh.has(ph.n);
+    const tskDone  = doneTsk[ph.n] || [];
+    const tskCount = ph.tasks.length;
+    const tskPct   = tskCount ? Math.round(tskDone.length / tskCount * 100) : 0;
+
     const modTags = ph.mods.map(id => {
       const m = MODS.find(x=>x.id===id);
       const c = m ? gc(m.group) : {hex:'#6b7394'};
       return `<span class="pmod" style="color:${c.hex};border-color:${c.hex}40;background:${c.hex}15">${id}</span>`;
     }).join('');
+
+    // Label badge (Phase name/type)
+    const labelBadge = ph.label ? `<span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;background:${ph.color}15;color:${ph.color};border:1px solid ${ph.color}30;margin-right:4px">${ph.label}</span>` : '';
+
+    // Mini progress bar for tasks
+    const miniProg = `
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+        <div style="flex:1;height:3px;background:var(--surf3);border-radius:2px;overflow:hidden;max-width:120px">
+          <div style="height:100%;width:${tskPct}%;background:${ph.color};border-radius:2px;transition:width .3s"></div>
+        </div>
+        <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3)">${tskDone.length}/${tskCount}</span>
+      </div>`;
+
+    const div = document.createElement('div');
+    div.className = 'pc' + (phDone ? ' ph-done' : '');
     div.innerHTML = `
       <div class="ph" onclick="togglePhase(this)">
         <span class="pnum">P${ph.n}</span>
-        <div class="pchk ${isDone?'done':''}" onclick="event.stopPropagation();toggleDone(${ph.n},this)">${isDone?'✓':''}</div>
+        <div class="pchk ${phDone?'done':''}" title="Phase komplett abhaken" onclick="event.stopPropagation();togglePhaseDone(${ph.n},this)">${phDone?'✓':''}</div>
         <div class="pinfo">
-          <div class="pname" style="${isDone?'opacity:.45;text-decoration:line-through':''}">${ph.name}</div>
-          <div class="pmeta"><span class="pdur">${ph.dur}</span><div class="pmods">${modTags}</div></div>
+          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:2px">
+            ${labelBadge}
+            <div class="pname" style="${phDone?'opacity:.45;text-decoration:line-through':''}">${ph.name}</div>
+          </div>
+          <div class="pmeta">
+            <span class="pdur">${ph.dur}</span>
+            <div class="pmods">${modTags}</div>
+          </div>
+          ${miniProg}
         </div>
         <span class="pchev">▶</span>
       </div>
       <div class="pbody">
-        <ul class="tasklist">${ph.tasks.map(t=>`<li class="ti">${t}</li>`).join('')}</ul>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);margin-bottom:12px;letter-spacing:1px;text-transform:uppercase">Einzelschritte abhaken:</div>
+        <ul class="tasklist" id="tlist-${ph.n}">
+          ${ph.tasks.map((t,i) => {
+            const isSep = t.startsWith('—');
+            const isDone = tskDone.includes(i);
+            if (isSep) return `<li style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;color:${ph.color};margin-top:12px;margin-bottom:4px">${t}</li>`;
+            return `<li class="ti-check ${isDone?'ti-done':''}" onclick="toggleTask(${ph.n},${i},this)">
+              <div class="ti-box ${isDone?'done':''}">${isDone?'✓':''}</div>
+              <span>${t}</span>
+            </li>`;
+          }).join('')}
+        </ul>
         <div class="presult">${ph.result}</div>
       </div>`;
     list.appendChild(div);
@@ -1265,21 +1320,51 @@ function renderPhases() {
 
 function togglePhase(hdr) { hdr.parentElement.classList.toggle('open'); }
 
-function toggleDone(n, el) {
-  done.has(n) ? done.delete(n) : done.add(n);
+function togglePhaseDone(n, el) {
+  donePh.has(n) ? donePh.delete(n) : donePh.add(n);
   el.classList.toggle('done');
-  el.textContent = done.has(n) ? '✓' : '';
+  el.textContent = donePh.has(n) ? '✓' : '';
   const nameEl = el.nextElementSibling?.querySelector('.pname');
-  if (nameEl) nameEl.style.cssText = done.has(n) ? 'opacity:.45;text-decoration:line-through' : '';
+  if (nameEl) nameEl.style.cssText = donePh.has(n) ? 'opacity:.45;text-decoration:line-through' : '';
   saveDone();
   updateProg();
 }
 
-function updateProg() {
-  const pct = Math.round(done.size / PHASES.length * 100);
-  document.getElementById('pf').style.width = pct + '%';
-  document.getElementById('pp').textContent = pct + '%';
+function toggleTask(phN, idx, li) {
+  if (!doneTsk[phN]) doneTsk[phN] = [];
+  const arr = doneTsk[phN];
+  const pos = arr.indexOf(idx);
+  if (pos >= 0) arr.splice(pos, 1); else arr.push(idx);
+  li.classList.toggle('ti-done');
+  const box = li.querySelector('.ti-box');
+  box.classList.toggle('done');
+  box.textContent = arr.includes(idx) ? '✓' : '';
+  saveDone();
+  // Update mini progress bar
+  const ph = PHASES.find(p=>p.n===phN);
+  if (ph) {
+    const pct = Math.round(arr.length / ph.tasks.filter(t=>!t.startsWith('—')).length * 100);
+    const card = li.closest('.pc');
+    const bar = card?.querySelector('.ph .pinfo div[style*="height:100%"]');
+    if (bar) bar.style.width = pct + '%';
+    const cnt = card?.querySelector('.ph .pinfo span[style*="DM Mono"]');
+    if (cnt) cnt.textContent = arr.length + '/' + ph.tasks.filter(t=>!t.startsWith('—')).length;
+  }
+  updateProg();
 }
+
+function updateProg() {
+  const total = totalTasks();
+  const done  = doneTasks();
+  const pct   = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('pf').style.width  = pct + '%';
+  document.getElementById('pp').textContent  = pct + '%';
+  // Also show phase count
+  const phPct = PHASES.length ? Math.round(donePh.size / PHASES.length * 100) : 0;
+  const sub = document.getElementById('prog-sub');
+  if (sub) sub.textContent = `${done} von ${total} Schritten · ${donePh.size} von ${PHASES.length} Phasen abgeschlossen`;
+}
+
 
 // ══════════════════════════════════════════════════════
 // MINDMAP — pure SVG with viewBox transform (no split)
